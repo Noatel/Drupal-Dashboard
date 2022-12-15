@@ -1,0 +1,6 @@
+.idea
+*.pyc
+.env
+.app_data
+/pycache/
+.DS_Store

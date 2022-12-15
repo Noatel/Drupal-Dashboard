@@ -1,0 +1,32 @@
+version: '3' 
+services:
+    db:
+      image: postgres
+      volumes:
+        - ./data/postgres:/var/lib/postgresql/data
+      restart: always
+      environment:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      ports:
+        - '5432:5432'
+    django:
+      build: .
+      command: python manage.py runserver 0.0.0.0:8000
+      ports:
+        - "8000:8000"
+      volumes:
+        - .:/code
+      restart: always
+      environment:
+        - APP_ENV=${APP_ENV}
+        - BASE_URL=${BASE_URL}
+        - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+        - DJANGO_DEBUG=${DJANGO_DEBUG}
+        - FIELD_ENCRYPTION_KEY=${FIELD_ENCRYPTION_KEY}
+        - REDIS_HOST=${REDIS_HOST}
+        - POSTGRES_HOST=${POSTGRES_HOST}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      depends_on:
+        - db
