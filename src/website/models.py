@@ -22,8 +22,8 @@ class Website(models.Model):
 
 class Page(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    url = models.CharField(max_length=50, null=False)
-    name = models.CharField(max_length=50, null=False)
+    url = models.CharField(max_length=255, null=False)
+    name = models.CharField(max_length=255, null=False)
 
     last_scanned = models.DateTimeField(null=True)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
