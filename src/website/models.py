@@ -30,7 +30,7 @@ class Page(models.Model):
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
-    website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True)
+    website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True, related_name='pages', default=3)
 
     def __str__(self):
         return self.url
