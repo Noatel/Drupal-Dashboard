@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from src.website.models import Website
+from src.website.models import Page
 from src.website.utils import scan_website
 
 
@@ -12,6 +12,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         website = kwargs['website']
-        db_website = Website.objects.get(url=website)
+        db_page = Page.objects.get(url=website)
 
-        scan_website(website=db_website)
+        scan_page(page=db_page)

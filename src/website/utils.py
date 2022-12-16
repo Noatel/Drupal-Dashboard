@@ -6,25 +6,17 @@ from src.website.models import Website
 from src.website.spiders.get_content_spider import ContentSpider
 from src.website.spiders.get_sitemap_spider import SitemapSpider
 
-# Based on the website that is from the database
-# go to the webiste
-def scan_website(website: Website):
-    # The website is already validated
-    url = website.url
-
-    # Go to the website using Scrapy
-    spider = CrawlerProcess()
-    spider.crawl(ContentSpider, url=website.url)
-    spider.start()
-
-
 def get_sitemap(website: Website):
-    # The website is already validated
-    url = website.url
-
-    # Go to the website using Scrapy
+    # Go to the sitemap using Scrapy
     spider = CrawlerProcess()
     spider.crawl(SitemapSpider, url=website.url)
     spider.start()
 
 
+# Based on the website that is from the database
+# go to the page
+def scan_page(website: Website):
+    # Go to the page using Scrapy
+    spider = CrawlerProcess()
+    spider.crawl(ContentSpider, url=website.url)
+    spider.start()
