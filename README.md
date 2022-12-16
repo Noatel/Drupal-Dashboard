@@ -47,7 +47,14 @@ python manage.py migrate
 
 ## Get all the URL's from a website
 
-For getting all the URLS of a website user the following command in the bash terminal. You NEED to have the website in your database 
+For getting all the URLS of a website user the following command in the bash terminal. You **NEED** to have the **WEBSITE** in your database 
 ```bash
 python manage.py getSitemapFromWebsite -w "https://www.typify.com"
+```
+
+## Get the content blocks
+To get the content blocks enter the the following command in the bash terminal. You **NEED** to have the **PAGE** in your database
+
+```bash
+python manage.py getDataFromWebsite -w "https://www.typify.com"
 ```
