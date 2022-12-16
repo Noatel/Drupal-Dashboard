@@ -2,6 +2,7 @@ from asyncio import tasks
 
 from celery.app import task
 from scrapy.crawler import CrawlerProcess, CrawlerRunner
+from scrapy.utils.log import configure_logging
 from twisted.internet import reactor, defer
 
 from src.website.models import Website, Page
@@ -30,6 +31,9 @@ def scan_page(page: Page):
 
 
 @defer.inlineCallbacks
+def crawl(url=str, runner=CrawlerRunner):
+    yield runner.crawl(CompareSpider, url=url)
+
 def compare_blocks(website: Website):
     # Start up a crawler
     # Because we need to get the new content blocks from the website
@@ -41,14 +45,16 @@ def compare_blocks(website: Website):
 
     # Loop through the pages get the content
     # compare the content with the LIVE data
-    process = CrawlerProcess()
+    configure_logging({'LOG_FORMAT': '%(levelname)s: %(message)s'})
+    runner = CrawlerRunner()
 
     for page in pages:
         # Now we need to find get the blocks with their content for each page
         # We do this by making the spiders ready for crawling
-        process.crawl(CompareSpider, url=page.url, query="dvh")
+
+        # print("prepare running" + page.url)
+        # yield process.crawl(CompareSpider, url=page.url, query="dvh")
+        crawl(page.url, runner)
 
     # Now we start the crawling
-    process.start()
-
-
+    reactor.run()

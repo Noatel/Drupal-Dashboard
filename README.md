@@ -58,3 +58,10 @@ To get the content blocks enter the the following command in the bash terminal. 
 ```bash
 python manage.py getDataFromPageUrl -w "https://www.typify.com"
 ```
+
+## Comparing of blocks
+To get the content blocks enter the the following command in the bash terminal. You **NEED** to have the **PAGE** in your database
+
+```bash
+python manage.py compareBlocksFromWebsite -w "https://www.typify.com"
+```

@@ -151,6 +151,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Scrapy settings
 TELNETCONSOLE_ENABLED=False
+TELNETCONSOLE_PORT = None
 CUSTOM_LOG_EXTENSION = True
 EXTENSIONS = {
    'scrapy.extensions.telnet.TelnetConsole': None,
