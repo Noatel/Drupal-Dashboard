@@ -13,11 +13,15 @@ services:
     django:
       build: .
       command: python manage.py runserver 0.0.0.0:8000
+      depends_on:
+        - db
+        - redis
       ports:
         - "8000:8000"
       volumes:
-        - .:/code
+        - .:/app
       restart: always
+      tty: true
       environment:
         - APP_ENV=${APP_ENV}
         - BASE_URL=${BASE_URL}
@@ -28,5 +32,10 @@ services:
         - POSTGRES_HOST=${POSTGRES_HOST}
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      depends_on:
-        - db
+    redis:
+      image: redis:latest
+      ports:
+        - 6379:6379
+      volumes:
+        - ./data:/data
+      command: redis-server --appendonly yes

@@ -1,44 +1,28 @@
-# syntax=.docker/dockerfile:1.4
 FROM ubuntu:latest
+FROM python
+
 MAINTAINER Noah Telussa "Noahtelussa@gmail.com"
 
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client
+
 RUN apt-get install nginx -y
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
 USER root
-COPY requirements.txt /app/requirements.txt
 
+RUN mkdir /app
+WORKDIR /app
 
-FROM python:3.7.5-stretch
+COPY requirements.txt /app/
+RUN pip install -r requirements.txt
+
+COPY . /app/
+RUN chmod -R 777 /app
+
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-ADD requirements.txt requirements.txt
-
-RUN pip install -U pip
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
-
-RUN pip install -r requirements.txt
-
-
-
-WORKDIR /code
-
-
-# install environment dependencies
-#RUN #pip3 install --upgrade pip
-
-#RUN pip install --upgrade pip
-#RUN pip install -r requirements.txt
-
-
-COPY . /code/
-#ENTRYPOINT ["python3"]
-#CMD ["manage.py", "runserver", "0.0.0.0:8000"]
-#
-## install Docker tools (cli, buildx, compose)
-#COPY --from=gloursdocker/docker / /
-#CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 8000
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
