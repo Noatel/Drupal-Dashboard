@@ -22,7 +22,7 @@ REDIS_HOST=redis
 ```
 After creating the .env file run the command 
 ```bash
-docker build
+docker-compose build
 ```
 When the build is finish enter docker-compose up to run the project
 ```bash
