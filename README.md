@@ -56,5 +56,5 @@ python manage.py getSitemapFromWebsite -w "https://www.typify.com"
 To get the content blocks enter the the following command in the bash terminal. You **NEED** to have the **PAGE** in your database
 
 ```bash
-python manage.py getDataFromWebsite -w "https://www.typify.com"
+python manage.py getDataFromPageUrl -w "https://www.typify.com"
 ```
