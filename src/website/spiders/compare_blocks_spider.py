@@ -30,31 +30,38 @@ class CompareSpider(scrapy.Spider):
         live_blocks = response.xpath(
             "//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()
 
+        page = self.urls[self.url_position]
         # Now we assign the block, we need a way to compare the block live and the block in the database
         # We do this based on the URL.
 
-        page = self.urls[self.url_position]
-        database_blocks = Block.objects.filter(page=page)
         # Looping through each block
+        for live_block in live_blocks:
+            # Get the block name and type based their classes
+            soup = BeautifulSoup(live_block, "html.parser")
+            block_name = soup.div['id']
+            block_type = soup.div['class'][4]
 
-        for live_block, database_block in zip(live_blocks, database_blocks):
-            # First we need to check if the live content block isn't deleted, empty
+            # So we need to search first if the class exsist in the content because otherwise its deleted
+            custom_block = Block.objects.filter(
+                page_id=page.id,
+                name=block_name,
+                type=block_type
+            ).get()
 
-            # So these are all the blocks, since we want te to create a history of all the content blocks
-            # we only take the newest one, so we filter op created_at
-            content_block = database_block.content.order_by('created_at').first()
-            if not live_block:
-                # TODO: Need more testing
-                create_content(Content.STATUS.DELETED, database_block.id, live_block)
-                continue
+            if custom_block:
+                content_block = custom_block.content.order_by('created_at').first()
 
-            # Check if the two variables are equal
-            if content_block.content == live_block:
-                # if they are equal we are g    oing to give them a green state, nothing changed
-                create_content(Content.STATUS.UNCHANGED, database_block.id, live_block)
+                # Check if the two variables are equal
+                if content_block.content == live_block:
+                    # if they are equal we are going to give them a green state, nothing changed
+                    create_content(Content.STATUS.UNCHANGED, custom_block.id, live_block)
+                else:
+                    # if they edited something, give it the edited state
+                    create_content(Content.STATUS.EDITED, custom_block.id, live_block)
+
             else:
-                # if they edited something, give it the edited state
-                create_content(Content.STATUS.EDITED, database_block.id, live_block)
+                # TODO: REWRITE
+                continue
 
         # Now for the next page on the website,
         # check if the position is equal to the amount of pages, and check if it's not empty
