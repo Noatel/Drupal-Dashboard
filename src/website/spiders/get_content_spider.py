@@ -23,6 +23,13 @@ class ContentSpider(scrapy.Spider):
         self.urls = urls
 
     def parse(self, response, **kwargs):
+        """
+        This function will receive a response from the scrapy webscraper.
+        When he got the response, filter for a block and save it to the database.
+        After saving the blocks and their contents, go to the next page.
+
+        :param response: The response the scraper gets from the webpage
+        """
         page = self.urls[self.url_position]
 
         # From the response that I get,
@@ -42,28 +49,17 @@ class ContentSpider(scrapy.Spider):
                 type=block_type
             )
 
-            if custom_block_created:
-                print('created content')
-                print(custom_block.id)
-
             # for each custom content block we want save
             content, created = Content.objects.get_or_create(
                 content=block,
                 block_id=custom_block.id,
             )
 
-            if created:
-                print('created content')
-                print(content.id)
-
         # Now for the next page on the website,
         # check if the position is equal to the amount of pages, and check if it's not empty
         # It's the length of the array + -1 because we start at 0
         if self.url_position < (len(self.urls) - 1):
 
-            print('Current curl: {}'.format(self.urls[self.url_position].url))
-            print(self.urls[self.url_position])
-            print('position {}'.format(self.url_position))
             # Add a plus one to go to the next iteration
             self.url_position += 1
 
