@@ -14,34 +14,63 @@ class ContentSpider(scrapy.Spider):
         logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
-        url = kwargs.get('url')
+        urls = kwargs.get('urls')
 
         # Set it to a self so I can access it later
-        self.start_urls = [url]
-        self.start_url = url
-        self.urls = []
+        self.start_urls = [urls[0].url]
+        self.start_url = urls[0].url
+        self.url_position = 0
+        self.urls = urls
 
     def parse(self, response, **kwargs):
-        page = Page.objects.filter(url=self.start_url).first()
+        page = self.urls[self.url_position]
 
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
         blocks = response.xpath("//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()
-
-        # Searching for each block
         for block in blocks:
+            # Get the block name and type based their classes
             soup = BeautifulSoup(block, "html.parser")
             block_name = soup.div['id']
             block_type = soup.div['class'][4]
 
+            # Try to save both blocks and content.
+            # If its already exist, the system doesn't make another one
             custom_block, custom_block_created = Block.objects.get_or_create(
                 page_id=page.id,
                 name=block_name,
                 type=block_type
             )
 
+            if custom_block_created:
+                print('created content')
+                print(custom_block.id)
+
             # for each custom content block we want save
             content, created = Content.objects.get_or_create(
                 content=block,
                 block_id=custom_block.id,
             )
+
+            if created:
+                print('created content')
+                print(content.id)
+
+        # Now for the next page on the website,
+        # check if the position is equal to the amount of pages, and check if it's not empty
+        # It's the length of the array + -1 because we start at 0
+        if self.url_position < (len(self.urls) - 1):
+
+            print('Current curl: {}'.format(self.urls[self.url_position].url))
+            print(self.urls[self.url_position])
+            print('position {}'.format(self.url_position))
+            # Add a plus one to go to the next iteration
+            self.url_position += 1
+
+            next_url = response.urljoin(self.urls[self.url_position].url)
+
+            # print('from url: {}'.format(self.urls[self.url_position]))
+            # print('to url: {}'.format(response.request.url))
+
+            # Yield the request to the next page which call this function again.
+            yield scrapy.Request(next_url, callback=self.parse)

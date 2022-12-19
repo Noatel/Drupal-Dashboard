@@ -14,7 +14,8 @@ class Command(BaseCommand):
         website = kwargs['website']
         db_website = Website.objects.filter(url=website).first()
 
-        compare_blocks(website=db_website)
+        if db_website:
+            compare_blocks(website=db_website)
 
 
 

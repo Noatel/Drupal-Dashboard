@@ -58,7 +58,7 @@ class Block(models.Model):
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
-    page = models.ForeignKey(Page, on_delete=models.CASCADE)
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True, related_name='blocks', default=3)
 
     def __str__(self):
         return self.name
