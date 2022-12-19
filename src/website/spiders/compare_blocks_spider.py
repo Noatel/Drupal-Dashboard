@@ -65,16 +65,13 @@ class CompareSpider(scrapy.Spider):
 
             next_url = response.urljoin(self.urls[self.url_position].url)
 
-            # print('from url: {}'.format(self.urls[self.url_position]))
-            # print('to url: {}'.format(response.request.url))
-
             # Yield the request to the next page which call this function again.
             yield scrapy.Request(next_url, callback=self.parse)
 
 
 def create_content(status, block_id: uuid, live_block: str) -> Content:
     # for each custom content block we want save
-    content, created = Content.objects.get_or_create(
+    content = Content.objects.create(
         content=live_block,
         block_id=block_id,
         status=status
