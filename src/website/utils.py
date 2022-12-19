@@ -43,33 +43,12 @@ def compare_blocks(website: Website):
         :param website: Give the website you want to get the sitemap from
     """
 
-
     # Start up a crawler
     # Because we need to get the new content blocks from the website
     # and compare it with the old content blocks
 
-    print('loading in the websites...')
-    # Get the website and a list of the pages
-    website = Website.objects.filter(url=website.url).first()
-    # Get a list of all pages, we only want to take the URL
-    print('loading in the pages...')
+    pages = website.pages.filter(website=website).distinct('url')
 
-    #wrong (not all pages) temp for testing
-    pages = website.pages.all()
-    for page in pages:
-        print('page with block')
-        print(page.url)
-        print('--------')
-        print(page.blocks)
-        print('--------')
-    print('loading in the crawling prcoes')
-    # Loop through the pages get the content
-    # compare the content with the LIVE data
     spider = CrawlerProcess()
-
-    # Now we need to find get the blocks with their content for each page
-    # We do this by making the spiders ready for crawling
-    # spider.crawl(CompareSpider, urls=pages)
-
-    # Now we start the crawling
+    spider.crawl(CompareSpider, urls=pages)
     spider.start()
