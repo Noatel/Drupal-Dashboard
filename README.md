@@ -65,3 +65,10 @@ To get the content blocks enter the the following command in the bash terminal. 
 ```bash
 python manage.py compareBlocksFromWebsite -w "https://www.typify.com"
 ```
+
+## Checking for deleted blocks
+Check for deleted blocks based on a given website
+
+```bash
+python manage.py checkForDeletedBlocks -w "https://www.typify.com"
+```

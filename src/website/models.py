@@ -3,6 +3,7 @@ import uuid
 
 import django
 from django.db import models
+from django.db.models import JSONField
 from model_utils import Choices
 from setuptools._entry_points import _
 
@@ -77,6 +78,17 @@ class Link(models.Model):
 
 
 class Content(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    content = models.TextField(null=True)
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
+
+    block = models.ForeignKey(Block, on_delete=models.CASCADE, related_name='content', null=False, default=3)
+
+    def __str__(self):
+        return self.block.name
+
+
+class Result(models.Model):
     STATUS = Choices(
         (1, 'UNCHANGED', _('Unchanged')),
         (2, 'EDITED', _('Edited')),
@@ -84,21 +96,10 @@ class Content(models.Model):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    content = models.TextField(null=True)
+    group_id = models.UUIDField(null=False, editable=False)
+    data = JSONField()
     status = models.CharField(max_length=50, null=False, choices=STATUS)
-    created_at = models.DateTimeField(default=django.utils.timezone.now)
-
-    block = models.ForeignKey(Block, on_delete=models.CASCADE, related_name='content', null=False, default=3)
-
-    def __str__(self):
-        return self.status
-
-
-class Result(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    content = models.TextField(null=True)
-    status = models.CharField(max_length=50, null=False)
-    block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False)
-
+    block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False, related_name='block', default=3)
+    checked = models.BooleanField(default=False)
     def __str__(self):
         return self.status

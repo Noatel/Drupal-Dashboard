@@ -1,9 +1,10 @@
 import logging
 import re
 import uuid
+from typing import List
 
 import scrapy
-from src.website.models import Block, Content, Page, Website
+from src.website.models import Block, Content, Page, Website, Result
 from bs4 import BeautifulSoup
 
 
@@ -34,6 +35,9 @@ class CompareSpider(scrapy.Spider):
         # Now we assign the block, we need a way to compare the block live and the block in the database
         # We do this based on the URL.
 
+        # Since we need to assign a group id to all the test result
+        group_id = uuid.uuid4()
+
         # Looping through each block
         for live_block in live_blocks:
             # Get the block name and type based their classes
@@ -48,20 +52,18 @@ class CompareSpider(scrapy.Spider):
                 type=block_type
             ).get()
 
+            # if you can find the class and name in the database:
             if custom_block:
                 content_block = custom_block.content.order_by('created_at').first()
 
                 # Check if the two variables are equal
                 if content_block.content == live_block:
                     # if they are equal we are going to give them a green state, nothing changed
-                    create_content(Content.STATUS.UNCHANGED, custom_block.id, live_block)
+                    # Do we even want to save if there aren't changes?
+                    create_result(Result.STATUS.UNCHANGED, custom_block.id, live_block, group_id)
                 else:
                     # if they edited something, give it the edited state
-                    create_content(Content.STATUS.EDITED, custom_block.id, live_block)
-
-            else:
-                # TODO: REWRITE
-                continue
+                    create_result(Result.STATUS.EDITED, custom_block.id, live_block, group_id)
 
         # Now for the next page on the website,
         # check if the position is equal to the amount of pages, and check if it's not empty
@@ -76,12 +78,18 @@ class CompareSpider(scrapy.Spider):
             yield scrapy.Request(next_url, callback=self.parse)
 
 
-def create_content(status, block_id: uuid, live_block: str) -> Content:
-    # for each custom content block we want save
-    content = Content.objects.create(
-        content=live_block,
+def create_result(status, block_id: uuid, live_block: str, group_id: uuid) -> Result:
+    # for each custom content block we want sav
+    result = Result.objects.create(
         block_id=block_id,
-        status=status
+        status=status,
+        data={
+            'content': live_block,
+        },
+        group_id=group_id,
+        checked=False
     )
 
-    return content
+    return result
+
+

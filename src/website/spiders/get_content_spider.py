@@ -1,5 +1,6 @@
 import logging
 import re
+import uuid
 
 import scrapy
 from src.website.models import Block, Content, Page
@@ -31,6 +32,8 @@ class ContentSpider(scrapy.Spider):
         :param response: The response the scraper gets from the webpage
         """
         page = self.urls[self.url_position]
+
+        # Since we need to assign a group id to all the test result
 
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
