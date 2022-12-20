@@ -23,6 +23,8 @@ django-jsoneditor~=0.1.0
 PyJWT~=2.1
 django-ratelimit~=3.0.1
 
-scrapy==2.5.1
+scrapy==2.7.1
+beautifulsoup4==4.11.1
+
 
 django-templated-email==3.0.0

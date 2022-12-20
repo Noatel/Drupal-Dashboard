@@ -3,6 +3,8 @@ import logging
 import scrapy
 from scrapy import Selector
 
+from src.website.models import Page, Website
+
 
 class SitemapSpider(scrapy.Spider):
     name = 'Sitemap spider'
@@ -13,6 +15,7 @@ class SitemapSpider(scrapy.Spider):
 
         # Set the URL from the argument to a variable
         url = kwargs.get('url')
+        website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
         if url.endswith('/'):
@@ -24,13 +27,23 @@ class SitemapSpider(scrapy.Spider):
         self.start_urls = [sitemap_url]
         self.start_url = sitemap_url
         self.urls = []
+        self.website_id = website.id
 
     def parse(self, response, **kwargs):
-        links = response.xpath('./body').extract()
-        urls = response.css("tr").extract()
+        links = response.text.split('\n')
+        for link in links:
 
-        print('data')
-        print(urls)
-        for url in urls:
-            print(url)
+            # Searching for <loc> and </loc> element
+            # When found, strip and get the link
+            if link[:7].replace(" ", "") == '<loc>' and link[-6:].replace(" ", "") == '</loc>':
+                # Remove <loc>
+                link = link.replace(link[-6:], "")
+                # Remove </loc>
+                link = link.replace(link[:7], "")
 
+                # add the page
+                page, created = Page.objects.get_or_create(
+                    url=link,
+                    name=link.rsplit('/', 1)[-1],
+                    website_id=self.website_id
+                )

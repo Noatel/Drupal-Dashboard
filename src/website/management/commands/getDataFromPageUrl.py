@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 
-from src.website.models import Website
-from src.website.utils import  get_sitemap
+from src.website.models import Page, Website
+from src.website.utils import scan_page
 
 
 class Command(BaseCommand):
@@ -12,6 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         website = kwargs['website']
-        db_website = Website.objects.get(url=website)
+        db_website = Website.objects.filter(url=website).first()
 
-        get_sitemap(website=db_website)
+        if db_website:
+            scan_page(website=db_website)

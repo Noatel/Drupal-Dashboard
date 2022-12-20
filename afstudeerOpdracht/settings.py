@@ -150,8 +150,13 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Scrapy settings
+TELNETCONSOLE_ENABLED = False
+TELNETCONSOLE_PORT = None
 CUSTOM_LOG_EXTENSION = True
+
 EXTENSIONS = {
-   'scrapy.extensions.telnet.TelnetConsole': None,
-   'afstudeerOpdracht.extension.CustomLogExtension': 1,
+    'scrapy.extensions.telnet.TelnetConsole': None,
+    'scrapy.telnet.TelnetConsole': None,
+    'scrapy.telnet.TelnetConsole': None,
+    'afstudeerOpdracht.extension.CustomLogExtension': 1,
 }
