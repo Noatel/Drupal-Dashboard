@@ -32,6 +32,16 @@ services:
         - POSTGRES_HOST=${POSTGRES_HOST}
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    react:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      ports:
+        - '3000:3000'
+      volumes:
+        - ./frontend:/app/frontend
+      depends_on:
+        - django
     redis:
       image: redis:latest
       ports:
