@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 
 from src.website.models import Website
-from src.website.utils import compare_blocks
+from src.website.utils import check_live_blocks
 
 
 class Command(BaseCommand):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
         db_website = Website.objects.filter(url=website).first()
 
         if db_website:
-            compare_blocks(website=db_website)
+            check_live_blocks(website=db_website)
 
 
 

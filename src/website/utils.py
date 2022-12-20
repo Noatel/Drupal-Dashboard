@@ -49,9 +49,7 @@ def compare_blocks(website: Website):
     # After we checked through the blocks, we need to check if there are any deleted blocks,
     # we need to search for the block that ISN'T tested
 
-
-    # TODO: WIP
-    # check_for_deleted_blocks(website)
+    check_for_deleted_blocks(website)
 
 
 def check_live_blocks(website: Website):
@@ -96,12 +94,6 @@ def check_for_deleted_blocks(website: Website):
             # This SHOULD give one result back for each test
             results = Result.objects.filter(block__id=block.id, checked=False).all()
 
-
-            if len(results) == 0:
-                print(results)
-                print(page.id)
-                print(group_id)
-
             if results:
 
                 # But for safety we are going to for loop it
@@ -120,5 +112,3 @@ def check_for_deleted_blocks(website: Website):
                     group_id=group_id,
                     checked=True
                 )
-
-

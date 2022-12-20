@@ -68,8 +68,5 @@ class ContentSpider(scrapy.Spider):
 
             next_url = response.urljoin(self.urls[self.url_position].url)
 
-            # print('from url: {}'.format(self.urls[self.url_position]))
-            # print('to url: {}'.format(response.request.url))
-
             # Yield the request to the next page which call this function again.
             yield scrapy.Request(next_url, callback=self.parse)
