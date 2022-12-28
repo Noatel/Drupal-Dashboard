@@ -27,6 +27,7 @@ django-ratelimit==4.0.0
 
 scrapy==2.7.1
 beautifulsoup4==4.11.1
-
+djoser==2.1.0
+markdown==3.3
 
 django-templated-email==3.0.0

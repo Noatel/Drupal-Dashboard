@@ -58,7 +58,7 @@ class ContentSpider(scrapy.Spider):
                 block_id=custom_block.id,
             )
 
-        # Now for the next page on the api,
+        # Now for the next page on the components,
         # check if the position is equal to the amount of pages, and check if it's not empty
         # It's the length of the array + -1 because we start at 0
         if self.url_position < (len(self.urls) - 1):

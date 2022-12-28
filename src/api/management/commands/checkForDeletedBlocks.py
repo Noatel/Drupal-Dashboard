@@ -5,13 +5,13 @@ from src.api.utils import check_for_deleted_blocks
 
 
 class Command(BaseCommand):
-    help = 'Check for the deleted content blocks based on a api'
+    help = 'Check for the deleted content blocks based on a components'
 
     def add_arguments(self, parser):
-        parser.add_argument('-w', '--api', type=str, help="Add a api")
+        parser.add_argument('-w', '--components', type=str, help="Add a components")
 
     def handle(self, *args, **kwargs):
-        website = kwargs['api']
+        website = kwargs['components']
         db_website = Website.objects.filter(url=website).first()
 
         if db_website:

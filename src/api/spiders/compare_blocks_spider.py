@@ -65,7 +65,7 @@ class CompareSpider(scrapy.Spider):
                     # if they edited something, give it the edited state
                     create_result(Result.STATUS.EDITED, custom_block.id, live_block, group_id)
 
-        # Now for the next page on the api,
+        # Now for the next page on the components,
         # check if the position is equal to the amount of pages, and check if it's not empty
         # It's the length of the array + -1 because we start at 0
         if self.url_position < (len(self.urls) - 1):

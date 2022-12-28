@@ -33,15 +33,21 @@ services:
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     react:
+      image: node:latest
+      working_dir: /app/frontend
+      command: npm start
       build:
         context: ./frontend
         dockerfile: Dockerfile
+        args:
+            BASE_URL: ${BASE_URL}
       ports:
         - '3000:3000'
       volumes:
-        - ./frontend:/app/frontend
+        - ./frontend:/app/frontend:rw,cached
       depends_on:
         - django
+
     redis:
       image: redis:latest
       ports:

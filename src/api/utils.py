@@ -3,7 +3,7 @@ import uuid
 from scrapy.crawler import CrawlerProcess
 from src.api.models import Website, Page, Result, Block
 
-# Import the Content spider to get content from the api
+# Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
@@ -12,9 +12,9 @@ from src.api.spiders.get_sitemap_spider import SitemapSpider
 
 def get_sitemap(website: Website):
     """
-    This function will get a sitemap for the assign api
+    This function will get a sitemap for the assign components
 
-    :param website: Give the api you want to get the sitemap from
+    :param website: Give the components you want to get the sitemap from
     """
     # Go to the sitemap using Scrapy
     spider = CrawlerProcess()
@@ -22,25 +22,27 @@ def get_sitemap(website: Website):
     spider.start()
 
 
-# Based on the api that is from the database
+# Based on the components that is from the database
 # go to the page
 def scan_page(website: Website):
     """
         This function will go to a specifc page and retreive drupal content blocks
 
-        :param website: Give the api you want to get the sitemap from
+        :param website: Give the components you want to get the sitemap from
     """
 
     pages = website.pages.filter(website=website).distinct('url')
+    print('{} is the amount of pages'.format(pages))
 
-    spider = CrawlerProcess()
-    spider.crawl(ContentSpider, urls=pages)
-    spider.start()
+    if pages:
+        spider = CrawlerProcess()
+        spider.crawl(ContentSpider, urls=pages)
+        spider.start()
 
 
 def compare_blocks(website: Website):
     """
-    First we are going to get the live blocks from the api and compare it with the blocks in the database
+    First we are going to get the live blocks from the components and compare it with the blocks in the database
     When the comparison is done, we going to check all the tested blocks and check for any deleted ones
     :param website:
     :return:
@@ -54,20 +56,21 @@ def compare_blocks(website: Website):
 
 def check_live_blocks(website: Website):
     """
-        This function will compare the blocks with the database and the live api
+        This function will compare the blocks with the database and the live components
 
-        :param website: Give the api you want to get the sitemap from
+        :param website: Give the components you want to get the sitemap from
     """
 
     # Start up a crawler
-    # Because we need to get the new content blocks from the api
+    # Because we need to get the new content blocks from the components
     # and compare it with the old content blocks
 
     pages = website.pages.filter(website=website).distinct('url')
 
-    spider = CrawlerProcess()
-    spider.crawl(CompareSpider, urls=pages)
-    spider.start()
+    if pages:
+        spider = CrawlerProcess()
+        spider.crawl(CompareSpider, urls=pages)
+        spider.start()
 
 
 def check_for_deleted_blocks(website: Website):

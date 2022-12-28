@@ -1,17 +1,13 @@
-from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 
-from . import views
-from .views import RegisterUserAPIView, UserDetailAPI
+from src.api.views import WebsiteViewSet, PageViewSet
 
-router = routers.DefaultRouter()
-router.register(r'websites', views.WebsiteViewSet, 'api')
-router.register(r'pages', views.PageViewSet, 'page')
+router = DefaultRouter()
+router.register('websites', WebsiteViewSet, basename='website')
+router.register('pages', PageViewSet, basename='page')
 
-urlpatterns = [
+api_urlpatterns = [
     path('', include(router.urls)),
-
-    path("get-details", UserDetailAPI.as_view()),
-    path('register', RegisterUserAPIView.as_view()),
+    path('/websites/{id}/pages', include(router.urls)),
 ]
