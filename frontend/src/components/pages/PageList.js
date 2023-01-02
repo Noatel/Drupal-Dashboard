@@ -1,8 +1,11 @@
-import React, {Component} from "react";
+import React, {Component, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import Page from "./Page";
+import Table from "react-bootstrap/Table";
+import {Button} from "react-bootstrap";
+import {scheduleWebsite} from "../website/WebsiteActions";
 
 
 class PageList extends Component {
@@ -10,9 +13,9 @@ class PageList extends Component {
         super(props);
         this.state = {
             pages: {},
-            websites: {},
-            website: {}
-        };
+            website: {},
+            websites: [],
+        }
     }
 
     onWebsiteClick = () => {
@@ -20,11 +23,32 @@ class PageList extends Component {
         this.props.onWebsiteClick(website);
     }
 
+
+    handleClick = (event) => {
+        const id = event.target.value
+        this.props.scheduleWebsite(id, {
+
+        });
+        // setLoading(true);
+    };
+
     render() {
         const {pages} = this.props.pages;
-        const {websites} = this.props.websites;
+        let {website} = this.props.websites.website;
 
-        console.warn(this.props)
+        if (typeof this.props.websites !== 'undefined') {
+            if (Object.keys(this.props.websites.website).length > 0 && typeof this.props.websites.website == 'object') {
+                website = this.props.websites.website;
+            } else {
+                website = {
+                    description: "",
+                    id: "",
+                    image: "",
+                    name: "",
+                    url: ""
+                }
+            }
+        }
 
         if (pages.length === 0) {
             return (
@@ -48,40 +72,69 @@ class PageList extends Component {
         return (
             <div>
                 <div className="row">
-                    <div className="col-md-6">
-                        <h1>adf</h1>
+                    <div className="col-md-2">
                     </div>
-                    <div className="col-md-4">
+                    <div className="col-md-6 mt-5">
+                        <h1>{website.name}</h1>
+                        <p>{website.description}</p>
                     </div>
-
+                    <div className="col-md-4 mt-5">
+                        <img src={website.image} alt=""/>
+                    </div>
                 </div>
-
                 <div className="row">
                     <div className="col-md-2">
                     </div>
 
                     <div className="col-md-10 mt-5">
-                        <h2>Pages:</h2>
-                        <div className="">
-                            {items}
+                        <h2 className="d-inline-block">Pages:</h2>
+                        <Button
+                            className="float-right"
+                            variant="primary"
+                            disabled={false}
+                            onClick={this.handleClick}
+                            value={website.id}
+                        >
+                            Schedule a test
+                        </Button>
+
+                        <div className="row">
+                            <div className="col-md-12">
+                                <Table striped bordered hover>
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>URL</th>
+                                        <th>Edit</th>
+                                        <th>View</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {items}
+                                    </tbody>
+                                </Table>
+                            </div>
                         </div>
-                        <hr/>
                     </div>
+                    <hr/>
                 </div>
             </div>
-        )
-            ;
+        );
     }
 }
 
 PageList.propTypes = {
     pages: PropTypes.object,
-    websites: PropTypes.object,
+    website: PropTypes.any,
+    websites: PropTypes.any,
 };
 
 const mapStateToProps = state => ({
-    websites: state.website,
+    websites: state.websites,
+    website: state.website,
     pages: state.pages
 });
 
-export default connect(mapStateToProps, {})(withRouter(PageList));
+export default connect(mapStateToProps, {
+    scheduleWebsite
+})(withRouter(PageList));

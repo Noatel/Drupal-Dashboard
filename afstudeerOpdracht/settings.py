@@ -220,3 +220,6 @@ WSGI_APPLICATION = 'afstudeerOpdracht.wsgi.application'
 
 MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'django_static'
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"

@@ -13,7 +13,7 @@ class Website(models.Model):
     url = models.CharField(max_length=50, null=False)
     name = models.CharField(max_length=50, null=False)
     description = models.TextField(null=True)
-    image = models.CharField(max_length=50, null=True)
+    image = models.CharField(max_length=255, null=True)
 
     created_at = models.DateTimeField(default=django.utils.timezone.now)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -104,3 +104,17 @@ class Result(models.Model):
 
     def __str__(self):
         return self.status
+
+
+class Scan(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True, related_name='scan', default=3)
+
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    scheduled_at = models.DateTimeField(blank=True, null=True)
+    started_at = models.DateTimeField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+
+

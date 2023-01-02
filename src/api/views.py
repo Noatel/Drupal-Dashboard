@@ -1,5 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework import permissions
+from rest_framework.decorators import action
+
 from src.api.models import Website, Page
 from src.api.serializers import WebsiteSerializer, PageSerializer
 from rest_framework.permissions import AllowAny
@@ -9,6 +11,8 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+
+from src.api.utils import schedule_website
 
 
 class WebsiteViewSet(viewsets.ModelViewSet):
@@ -23,6 +27,16 @@ class WebsiteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter()
+
+    @action(methods=['post'], detail=True)
+    def schedule(self, request, pk):
+        """
+        Schedule a task in based on website id
+        """
+
+        schedule = schedule_website(websiteId=pk)
+
+        return Response(data='Scheduled', status=status.HTTP_201_CREATED, content_type="application/json")
 
 
 class PageViewSet(viewsets.ModelViewSet):

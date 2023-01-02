@@ -1,7 +1,7 @@
 import uuid
 
 from scrapy.crawler import CrawlerProcess
-from src.api.models import Website, Page, Result, Block
+from src.api.models import Website, Page, Result, Block, Scan
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
@@ -115,3 +115,22 @@ def check_for_deleted_blocks(website: Website):
                     group_id=group_id,
                     checked=True
                 )
+
+
+def schedule_website(websiteId: uuid.UUID):
+    website = Website.objects.filter(id=websiteId).first()
+    schedule, created = Scan.objects.get_or_create(
+        website=website
+    )
+
+    return schedule
+
+
+def start_scan(websiteId: uuid.UUID):
+    website = Website.objects.filter(id=websiteId).first()
+
+
+
+
+
+

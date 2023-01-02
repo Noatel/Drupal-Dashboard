@@ -11,6 +11,7 @@ const createRootReducer = history =>
     auth: loginReducer,
     websites: websitesReducer,
     pages: pagesReducer,
+    website: {}
   });
 
 export default createRootReducer;

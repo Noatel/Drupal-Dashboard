@@ -3,7 +3,8 @@ import { SET_TOKEN, SET_CURRENT_USER, UNSET_CURRENT_USER } from "./LoginTypes";
 const initialState = {
   isAuthenticated: false,
   user: {},
-  token: ""
+  token: "",
+  website: {}
 };
 
 export const loginReducer = (state = initialState, action) => {

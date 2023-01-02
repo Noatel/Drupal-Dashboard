@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { deleteWebsite, updateWebsite } from "./WebsiteActions";
 import { Button, Nav} from "react-bootstrap";
+import Website from "./Website";
 
 class WebsiteDetail extends Component {
   onDeleteClick = () => {
@@ -35,7 +36,9 @@ class WebsiteDetail extends Component {
 Website.propTypes = {
   website: PropTypes.object.isRequired
 };
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+
+});
 
 export default connect(mapStateToProps, { deleteWebsite, updateWebsite })(
   withRouter(Website)

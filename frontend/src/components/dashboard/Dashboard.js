@@ -12,11 +12,14 @@ class Dashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            website: {}
-        };
+            website: {},
+            websites: []
+        }
     }
 
     handlePages = (pageObject) => {
+        console.warn('pageObject')
+        console.warn(pageObject)
         this.setState({pages: pageObject});
     }
 
@@ -42,7 +45,7 @@ class Dashboard extends Component {
                     </Navbar.Collapse>
                 </Navbar>
 
-                <Sidebar pages={pages} />
+                <Sidebar pages={pages}/>
 
                 <Container>
                     {/*<AddWebsite/>*/}
@@ -58,14 +61,14 @@ Dashboard.propTypes = {
     auth: PropTypes.object.isRequired,
     pages: PropTypes.object,
     website: PropTypes.object,
-    websites: PropTypes.object,
+    websites: PropTypes.any,
 };
 
 const mapStateToProps = state => ({
     auth: state.auth,
     pages: state.pages,
     websites: state.websites,
-    website: state.website
+    website: state.website,
 });
 
 export default connect(mapStateToProps, {
