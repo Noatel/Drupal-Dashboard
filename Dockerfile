@@ -21,17 +21,5 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
-COPY ./ ./
+COPY . /app/
 RUN chmod -R 777 /app
-
-
-ADD ./afstudeerOpdracht /app/afstudeerOpdracht
-
-
-# This was for react?
-#EXPOSE 8000
-#CMD ["node", "./deploy-dev.js"]
-
-EXPOSE 8000
-
-CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]

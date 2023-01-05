@@ -1,29 +1,29 @@
 version: '3'
-
-
 services:
   db:
     image: postgres
     volumes:
-      - .:/data/postgres:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     restart: always
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - '5432:5432'
-  django: &base
+  django: &django
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
       - redis
-      - rabbit
-    expose:
-      - 8000
+      - rabbitmq
+      - celery_worker
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
     restart: always
+    tty: true
     environment:
       - APP_ENV=${APP_ENV}
       - BASE_URL=${BASE_URL}
@@ -34,53 +34,19 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - RABBITMQ_HOST=${RABBITMQ_HOST}
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-  scheduler:
-    <<: *base
-    command: celery -A afstudeerOpdracht.celery_app beat -l info
-    depends_on:
-      - django
-      - redis
-      - rabbit
-      - db
-    volumes:
-      - .:/app
-      - ./afstudeerOpdracht:/app/celery
-  rabbit:
-    container_name: "rabbitmq"
-    hostname: "rabbitmq"
-    image: "rabbitmq:3-management"
-    restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER="guest"
-      - RABBITMQ_DEFAULT_PASS="guest"
-      - RABBITMQ_DEFAULT_VHOST="/"
-      - SERVICE_PORTS="5672
-      - TCP_PORTS=5672
   redis:
-    container_name: "redis"
     image: redis:latest
     ports:
-      - '6379:6379'
-    expose:
-      - 6379
+      - 6379:6379
     volumes:
       - ./data:/data
     command: redis-server --appendonly yes
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-  celery:
-    <<: *base
-    command: celery -A afstudeerOpdracht.celery_app worker --max-tasks-per-child 20 -Q default
+  rabbitmq:
+    image: rabbitmq:3.11.5-alpine
+  celery_worker:
+    <<: *django
+    command: celery -A afstudeerOpdracht worker --loglevel=info
+    ports: []
     depends_on:
-      - rabbit
-      - django
-      - redis
+      - rabbitmq
       - db
-    volumes:
-      - .:/app
-      - ./afstudeerOpdracht:/app/celery

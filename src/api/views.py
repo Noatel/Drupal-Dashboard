@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework import permissions
 from rest_framework.decorators import action
 
+from afstudeerOpdracht.celery import debug_task
 from src.api.models import Website, Page
 from src.api.serializers import WebsiteSerializer, PageSerializer
 from rest_framework.permissions import AllowAny
@@ -13,6 +14,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 
 from src.api.utils import schedule_website
+from src.api.tasks import hello
 
 
 class WebsiteViewSet(viewsets.ModelViewSet):
@@ -21,6 +23,8 @@ class WebsiteViewSet(viewsets.ModelViewSet):
     """
     queryset = Website.objects.all().order_by('name')
     serializer_class = WebsiteSerializer
+
+    hello.delay()
 
     def perform_create(self, serializer):
         serializer.save()
