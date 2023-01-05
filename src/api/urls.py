@@ -9,5 +9,5 @@ router.register('pages', PageViewSet, basename='page')
 
 api_urlpatterns = [
     path('', include(router.urls)),
-    path('/websites/{id}/pages', include(router.urls)),
+    path('websites/{id}/pages', include(router.urls)),
 ]

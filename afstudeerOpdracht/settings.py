@@ -13,8 +13,9 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+from celery.schedules import crontab
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-zmz_+njux90svs3#0ed9gjxl1&p8iw2@p$qh5=ig^c$x$5d%5)
 DEBUG = True
 
 ALLOWED_HOSTS = [
- "*"
+    "*"
 ]
 
 MEDIA_URL = '/media/'
@@ -34,6 +35,7 @@ MEDIA_URL = '/media/'
 # Application definition
 
 INSTALLED_APPS = [
+    "encrypted_model_fields",
     'src.api',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,7 +46,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'djoser'
+    'djoser',
+    'django_celery_beat',
+    'django_celery_results'
 ]
 
 MIDDLEWARE = [
@@ -117,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -130,7 +133,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Cache settings
 
@@ -168,8 +170,7 @@ EXTENSIONS = {
     'afstudeerOpdracht.extension.CustomLogExtension': 1,
 }
 
-
-CORS_ALLOW_ALL_ORIGINS=True # Add this line too
+CORS_ALLOW_ALL_ORIGINS = True  # Add this line too
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
@@ -178,12 +179,12 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.TokenAuthentication',
-        ),
-        'DEFAULT_PERMISSION_CLASSES': [
-            'rest_framework.permissions.IsAuthenticated',
-        ]
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
 
 ROOT_URLCONF = 'afstudeerOpdracht.urls'
@@ -221,5 +222,15 @@ WSGI_APPLICATION = 'afstudeerOpdracht.wsgi.application'
 MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'django_static'
 
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+# Celery config
+
+broker_url = "amqp://" + os.getenv("RABBITMQ_DEFAULT_USER") + ":" + os.getenv(
+    "RABBITMQ_DEFAULT_PASS") + "@" + os.getenv("RABBITMQ_HOST")
+
+BROKER_URL = broker_url
+# if not broker_url.endswith(BROKER_HEARTBEAT):
+#     broker_url += BROKER_HEARTBEAT
+
+broker_heartbeat = 30
+broker_pool_limit = 1
+broker_connection_timeout = 10
