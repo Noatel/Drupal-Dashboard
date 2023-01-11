@@ -33,3 +33,4 @@ markdown==3.3
 django-templated-email==3.0.0
 importlib-metadata==4.13.0
 django_celery_results==2.4.0
+twisted==22.10.0

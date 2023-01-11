@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {deleteWebsite, setWebsite, updateWebsite} from "./WebsiteActions";
@@ -21,7 +20,6 @@ class Website extends Component {
 
     render() {
         const {website} = this.props
-
         return (
             <Nav.Item>
                 <Nav.Link value={website.id} onClick={() => this.loadPages(website)}>

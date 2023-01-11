@@ -3,7 +3,7 @@ from rest_framework import permissions
 from rest_framework.decorators import action
 
 from afstudeerOpdracht.celery import debug_task
-from src.api.models import Website, Page
+from src.api.models import Website, Page, Block
 from src.api.serializers import WebsiteSerializer, PageSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
@@ -12,9 +12,7 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-
 from src.api.utils import schedule_website
-from src.api.tasks import hello
 
 
 class WebsiteViewSet(viewsets.ModelViewSet):
@@ -24,13 +22,11 @@ class WebsiteViewSet(viewsets.ModelViewSet):
     queryset = Website.objects.all().order_by('name')
     serializer_class = WebsiteSerializer
 
-    hello.delay()
+    def get_queryset(self):
+        return self.queryset.filter()
 
     def perform_create(self, serializer):
         serializer.save()
-
-    def get_queryset(self):
-        return self.queryset.filter()
 
     @action(methods=['post'], detail=True)
     def schedule(self, request, pk):
@@ -51,9 +47,23 @@ class PageViewSet(viewsets.ModelViewSet):
     serializer_class = PageSerializer
 
     def get_queryset(self):
+
+        # Return all pages with from a website
         if self.request.GET.get('website_id'):
             id = self.request.GET.get('website_id')
             pages = Page.objects.filter(website__id=id)
+
+        # Return a page with all the content blocks
+        elif self.request.GET.get('blocks') == 'true':
+            id = self.request.GET.get('page_id')
+            # I know, it isnt pages, they are blocks
+            pages = Page.objects.filter(id=id)
+        # Return all pages of a specific page
+        elif self.request.GET.get('page_id'):
+            id = self.request.GET.get('page_id')
+            pages = Page.objects.filter(id=id)
+
+        # Return all pages
         else:
             pages = self.queryset.filter()
 

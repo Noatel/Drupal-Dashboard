@@ -8,8 +8,19 @@ class Page extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pages: {}
+            pages: {},
+            load: false,
+            modalShow: false,
         };
+
+    }
+
+    handlePageDetail = (page) => {
+        this.props.onPageDetail(page);
+    }
+
+    handleShow = () => {
+        this.setState({modalShow: false});
     }
 
     render() {
@@ -18,13 +29,22 @@ class Page extends Component {
         if (page.name === '') {
             page.name = "Name not found"
         }
+
         return (
-                    <tr>
-                      <td><p style={{textTransform: 'capitalize'}}>{page.name.split('-').join(' ') }  </p></td>
-                      <td><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
-                      <td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>
-                      <td><a href={page.url + "/view"}><AiFillEye/></a></td>
-                    </tr>
+            <tr>
+                <td><p style={{textTransform: 'capitalize'}}>{page.name.split('-').join(' ')}  </p></td>
+                <td><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
+                <td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>
+                <td>
+                    <a href="/" onClick={(event) => {
+                        event.preventDefault();
+                        this.handlePageDetail(page)
+                    }}>
+                        <AiFillEye/>
+                    </a>
+                </td>
+            </tr>
+
 
         );
     }
@@ -32,6 +52,8 @@ class Page extends Component {
 
 Page.propTypes = {
     pages: PropTypes.object,
+    onPageDetail: PropTypes.any,
+    handlePageDetail: PropTypes.any,
 };
 
 const mapStateToProps = state => ({

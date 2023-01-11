@@ -18,8 +18,6 @@ class Dashboard extends Component {
     }
 
     handlePages = (pageObject) => {
-        console.warn('pageObject')
-        console.warn(pageObject)
         this.setState({pages: pageObject});
     }
 

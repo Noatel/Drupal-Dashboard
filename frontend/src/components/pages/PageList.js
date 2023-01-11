@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useState} from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
@@ -6,6 +6,7 @@ import Page from "./Page";
 import Table from "react-bootstrap/Table";
 import {Button} from "react-bootstrap";
 import {scheduleWebsite} from "../website/WebsiteActions";
+import PageDetail from "./PageDetail";
 
 
 class PageList extends Component {
@@ -13,6 +14,7 @@ class PageList extends Component {
         super(props);
         this.state = {
             pages: {},
+            page: {},
             website: {},
             websites: [],
         }
@@ -26,11 +28,17 @@ class PageList extends Component {
 
     handleClick = (event) => {
         const id = event.target.value
-        this.props.scheduleWebsite(id, {
-
-        });
+        this.props.scheduleWebsite(id, {});
         // setLoading(true);
     };
+
+    handlePageDetail = (detailPage) => {
+        this.setState({
+            page: detailPage,
+            detailPage: true
+        });
+    }
+
 
     render() {
         const {pages} = this.props.pages;
@@ -50,6 +58,18 @@ class PageList extends Component {
             }
         }
 
+        if (pages.length === 0 && website.id !== '' && !Array.isArray(this.props.websites.website)) {
+            return (
+                <div className="row">
+                    <div className="col-md-2">
+                    </div>
+
+                    <div className="col-md-10 mt-5">
+                        <h2>No pages available</h2>
+                    </div>
+                </div>
+            );
+        }
         if (pages.length === 0) {
             return (
                 <div className="row">
@@ -65,59 +85,65 @@ class PageList extends Component {
 
         let items = pages.map(page => {
             return (
-                <Page key={page.id} page={page}/>
+                <Page key={page.id} page={page} onPageDetail={this.handlePageDetail}/>
             );
         });
 
         return (
             <div>
-                <div className="row">
-                    <div className="col-md-2">
-                    </div>
-                    <div className="col-md-6 mt-5">
-                        <h1>{website.name}</h1>
-                        <p>{website.description}</p>
-                    </div>
-                    <div className="col-md-4 mt-5">
-                        <img src={website.image} alt=""/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-2">
-                    </div>
-
-                    <div className="col-md-10 mt-5">
-                        <h2 className="d-inline-block">Pages:</h2>
-                        <Button
-                            className="float-right"
-                            variant="primary"
-                            disabled={false}
-                            onClick={this.handleClick}
-                            value={website.id}
-                        >
-                            Schedule a test
-                        </Button>
-
+                {!this.state.detailPage ? (
+                    <div>
                         <div className="row">
-                            <div className="col-md-12">
-                                <Table striped bordered hover>
-                                    <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>URL</th>
-                                        <th>Edit</th>
-                                        <th>View</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {items}
-                                    </tbody>
-                                </Table>
+                            <div className="col-md-2">
+                            </div>
+                            <div className="col-md-6 mt-5">
+                                <h1>{website.name}</h1>
+                                <p>{website.description}</p>
+                            </div>
+                            <div className="col-md-4 mt-5">
+                                <img src={website.image} alt=""/>
                             </div>
                         </div>
+                        <div className="row">
+                            <div className="col-md-2">
+                            </div>
+
+                            <div className="col-md-10 mt-5">
+                                <h2 className="d-inline-block">Pages:</h2>
+                                <Button
+                                    className="float-right"
+                                    variant="primary"
+                                    disabled={false}
+                                    onClick={this.handleClick}
+                                    value={website.id}
+                                >
+                                    Schedule a test
+                                </Button>
+
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <Table striped bordered hover>
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>URL</th>
+                                                <th>Edit</th>
+                                                <th>View</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {items}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+                        </div>
                     </div>
-                    <hr/>
-                </div>
+                ) : (
+                    <PageDetail page={this.state.page}/>
+                )}
             </div>
         );
     }
@@ -125,14 +151,18 @@ class PageList extends Component {
 
 PageList.propTypes = {
     pages: PropTypes.object,
+    page: PropTypes.object,
     website: PropTypes.any,
     websites: PropTypes.any,
+    detailPage: PropTypes.any,
 };
 
 const mapStateToProps = state => ({
     websites: state.websites,
     website: state.website,
-    pages: state.pages
+    pages: state.pages,
+    page: state.page,
+    detailPage: false,
 });
 
 export default connect(mapStateToProps, {

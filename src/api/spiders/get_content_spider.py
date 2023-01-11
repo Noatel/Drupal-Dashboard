@@ -66,7 +66,10 @@ class ContentSpider(scrapy.Spider):
             # Add a plus one to go to the next iteration
             self.url_position += 1
 
-            next_url = response.urljoin(self.urls[self.url_position].url)
+            try:
+                next_url = response.urljoin(self.urls[self.url_position].url)
 
-            # Yield the request to the next page which call this function again.
-            yield scrapy.Request(next_url, callback=self.parse)
+                # Yield the request to the next page which call this function again.
+                yield scrapy.Request(next_url, callback=self.parse)
+            except IndexError:
+                pass

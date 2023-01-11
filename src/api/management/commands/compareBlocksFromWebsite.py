@@ -15,7 +15,7 @@ class Command(BaseCommand):
         db_website = Website.objects.filter(url=website).first()
 
         if db_website:
-            check_live_blocks(website=db_website)
+            check_live_blocks(websiteId=db_website.id)
 
 
 

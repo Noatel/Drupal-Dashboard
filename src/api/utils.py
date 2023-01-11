@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from scrapy.crawler import CrawlerProcess
 from src.api.models import Website, Page, Result, Block, Scan
@@ -54,20 +55,24 @@ def compare_blocks(website: Website):
     check_for_deleted_blocks(website)
 
 
-def check_live_blocks(website: Website):
+def check_live_blocks(websiteId: uuid.UUID):
     """
         This function will compare the blocks with the database and the live components
 
-        :param website: Give the components you want to get the sitemap from
+        :param websiteId: Give the components you want to get the sitemap from
     """
 
     # Start up a crawler
     # Because we need to get the new content blocks from the components
     # and compare it with the old content blocks
 
-    pages = website.pages.filter(website=website).distinct('url')
+    print('check the pages')
+    website = Website.objects.filter(id=websiteId).first()
+    pages = list(website.pages.filter(website=website).distinct('url'))
 
+    print('the page amount is {}'.format(len(pages)))
     if pages:
+        print('start crawling')
         spider = CrawlerProcess()
         spider.crawl(CompareSpider, urls=pages)
         spider.start()
@@ -124,15 +129,3 @@ def schedule_website(websiteId: uuid.UUID):
     )
 
     return schedule
-
-
-def start_scan(websiteId: uuid.UUID):
-    website = Website.objects.filter(id=websiteId).first()
-
-
-
-
-
-
-
-

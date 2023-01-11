@@ -30,6 +30,21 @@ export const getPagesByWebsiteId = id => dispatch => {
         });
 };
 
+
+export const getBlocksByPageId = id => dispatch => {
+    axios
+        .get(`/pages?page_id=${id}&blocks=true`)
+        .then(response => {
+            dispatch({
+                type: GET_pages,
+                payload: response.data,
+            });
+        })
+        .catch(error => {
+            toastOnError(error);
+        });
+};
+
 export const addPages = website => dispatch => {
   axios
     .post("/pages/", website)

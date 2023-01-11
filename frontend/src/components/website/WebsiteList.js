@@ -22,7 +22,6 @@ class WebsiteList extends Component {
         const website = this.website.value;
         this.props.onWebsiteClick(website);
     }
-
     render() {
         const {websites} = this.props.websites;
 
@@ -36,7 +35,7 @@ class WebsiteList extends Component {
         }
 
         let items = websites.map(website => {
-            return <Website key={website.id} website={website}  onSelectPages={this.handlePages}/>;
+            return <Website key={website.id} website={website}  onSelectPages={this.handlePages} />;
         });
 
         return (
