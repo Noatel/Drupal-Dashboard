@@ -32,7 +32,6 @@ class SitemapSpider(scrapy.Spider):
     def parse(self, response, **kwargs):
         links = response.text.split('\n')
         for link in links:
-
             # Searching for <loc> and </loc> element
             # When found, strip and get the link
             if link[:7].replace(" ", "") == '<loc>' and link[-6:].replace(" ", "") == '</loc>':

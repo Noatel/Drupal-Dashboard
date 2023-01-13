@@ -33,11 +33,10 @@ class ContentSpider(scrapy.Spider):
         """
         page = self.urls[self.url_position]
 
-        # Since we need to assign a group id to all the test result
-
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
-        blocks = response.xpath("//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()
+        blocks = filter_blocks(response=response)
+
         for block in blocks:
             # Get the block name and type based their classes
             soup = BeautifulSoup(block, "html.parser")
@@ -73,3 +72,15 @@ class ContentSpider(scrapy.Spider):
                 yield scrapy.Request(next_url, callback=self.parse)
             except IndexError:
                 pass
+
+
+def filter_blocks(response):
+    """
+            This function will filter all the blocks on the page and will return an
+            array of blocks.
+
+            :param response: The response the scraper gets from the webpage
+            :return Array of Drupal blocks
+    """
+    return response.xpath("//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()
+

@@ -28,8 +28,7 @@ class CompareSpider(scrapy.Spider):
 
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
-        live_blocks = response.xpath(
-            "//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()
+        live_blocks = filter_blocks(response=response)
 
         page = self.urls[self.url_position]
         # Now we assign the block, we need a way to compare the block live and the block in the database
@@ -93,3 +92,12 @@ def create_result(status, block_id: uuid, live_block: str, group_id: uuid) -> Re
     return result
 
 
+def filter_blocks(response):
+    """
+            This function will filter all the blocks on the page and will return an
+            array of blocks.
+
+            :param response: The response the scraper gets from the webpage
+            :return Array of Drupal blocks
+    """
+    return response.xpath("//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()

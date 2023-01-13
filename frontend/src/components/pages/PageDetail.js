@@ -88,6 +88,9 @@ class PageDetail extends Component {
                             </Modal.Body>
                         </Modal>
                     </td>
+                    <td>
+
+                    </td>
                 </tr>
             );
         });
