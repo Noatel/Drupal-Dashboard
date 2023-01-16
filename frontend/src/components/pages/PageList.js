@@ -1,12 +1,13 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import {withRouter} from "react-router-dom";
-import Page from "./Page";
+import {Link, withRouter} from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import {Button} from "react-bootstrap";
+import {Button, Spinner} from "react-bootstrap";
 import {scheduleWebsite} from "../website/WebsiteActions";
-import PageDetail from "./PageDetail";
+import axios from "axios";
+import {toastOnError} from "../../utils/Utils";
+import {AiFillEye, AiOutlineLink, BsFillPencilFill} from "react-icons/all";
 
 
 class PageList extends Component {
@@ -17,7 +18,22 @@ class PageList extends Component {
             page: {},
             website: {},
             websites: [],
+            isActive: false,
         }
+    }
+
+    componentDidMount() {
+        const {id} = this.props.match.params;
+
+        axios.get(`/pages?website_id=${id}`).then(response => {
+            this.setState({
+                pages: response.data,
+                isActive: true,
+            })
+        }).catch(error => {
+            toastOnError(error);
+        });
+
     }
 
     onWebsiteClick = () => {
@@ -41,24 +57,18 @@ class PageList extends Component {
 
 
     render() {
-        const {pages} = this.props.pages;
         let {website} = this.props.websites.website;
 
-        if (typeof this.props.websites !== 'undefined') {
-            if (Object.keys(this.props.websites.website).length > 0 && typeof this.props.websites.website == 'object') {
-                website = this.props.websites.website;
-            } else {
-                website = {
-                    description: "",
-                    id: "",
-                    image: "",
-                    name: "",
-                    url: ""
-                }
-            }
+        if (!this.state.isActive) {
+            return (
+                <div className="spinner-div">
+                    <Spinner animation="border" role="status" className="spinner">
+                    </Spinner>
+                </div>
+            )
         }
 
-        if (pages.length === 0 && website.id !== '' && !Array.isArray(this.props.websites.website)) {
+        if (Object.keys(this.state.pages).length === 0 && website.id !== '' && !Array.isArray(this.props.websites.website)) {
             return (
                 <div className="row">
                     <div className="col-md-2">
@@ -70,80 +80,77 @@ class PageList extends Component {
                 </div>
             );
         }
-        if (pages.length === 0) {
-            return (
-                <div className="row">
-                    <div className="col-md-2">
-                    </div>
 
-                    <div className="col-md-10 mt-5">
-                        <h2>Select a website in the sidebar</h2>
-                    </div>
-                </div>
-            );
-        }
-
-        let items = pages.map(page => {
+        let items = this.state.pages.map(page => {
             return (
-                <Page key={page.id} page={page} onPageDetail={this.handlePageDetail}/>
+                <tr key={page.id}>
+                    <td><p
+                        style={{textTransform: 'capitalize'}}>{page.name ? page.name.split('-').join(' ') : "None"}  </p>
+                    </td>
+                    <td><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
+                    <td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>
+                    <td>
+                        <Link to={"/page/" + page.id} key={page.id} page={page}>
+                            <AiFillEye/>
+                        </Link>
+                    </td>
+                </tr>
             );
         });
 
         return (
             <div>
-                {!this.state.detailPage ? (
-                    <div>
-                        <div className="row">
-                            <div className="col-md-2">
-                            </div>
-                            <div className="col-md-6 mt-5">
-                                <h1>{website.name}</h1>
-                                <p>{website.description}</p>
-                            </div>
-                            <div className="col-md-4 mt-5">
-                                <img src={website.image} alt=""/>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-2">
-                            </div>
-
-                            <div className="col-md-10 mt-5">
-                                <h2 className="d-inline-block">Pages:</h2>
-                                <Button
-                                    className="float-right"
-                                    variant="primary"
-                                    disabled={false}
-                                    onClick={this.handleClick}
-                                    value={website.id}
-                                >
-                                    Schedule a test
-                                </Button>
-
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <Table striped bordered hover>
-                                            <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>URL</th>
-                                                <th>Edit</th>
-                                                <th>View</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {items}
-                                            </tbody>
-                                        </Table>
-                                    </div>
+                <div className="container">
+                        <div>
+                            <div className="row">
+                                <div className="col-md-2">
+                                </div>
+                                <div className="col-md-6 mt-5">
+                                    <h1>{website.name}</h1>
+                                    <p>{website.description}</p>
+                                </div>
+                                <div className="col-md-4 mt-5">
+                                    <img src={website.image} alt=""/>
                                 </div>
                             </div>
-                            <hr/>
+                            <div className="row">
+                                <div className="col-md-2">
+                                </div>
+
+                                <div className="col-md-10 mt-5">
+                                    <h2 className="d-inline-block">Pages:</h2>
+                                    <Button
+                                        className="float-right"
+                                        variant="primary"
+                                        disabled={false}
+                                        onClick={this.handleClick}
+                                        value={website.id}
+                                    >
+                                        Schedule a test
+                                    </Button>
+
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <Table striped bordered hover>
+                                                <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>URL</th>
+                                                    <th>Edit</th>
+                                                    <th>View</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {items}
+                                                </tbody>
+                                            </Table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr/>
+                            </div>
                         </div>
                     </div>
-                ) : (
-                    <PageDetail page={this.state.page}/>
-                )}
             </div>
         );
     }
@@ -166,5 +173,5 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-    scheduleWebsite
+    scheduleWebsite,
 })(withRouter(PageList));

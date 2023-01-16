@@ -21,8 +21,7 @@
 }
 
 #sidebar-wrapper .sidebar-heading {
-    padding: 0.875rem 1.25rem;
-    font-size: 1.2rem;
+
 }
 
 #page-content-wrapper {
@@ -51,6 +50,63 @@
         transform: rotate(360deg);
     }
 }
-.modal{
+
+.modal {
     z-index: 9999;
+}
+
+.loginCol {
+    margin-top: 100px;
+}
+
+.spinner-div {
+    justify-content: center;
+    display: flex;
+
+}
+
+.spinner {
+    height: 100px;
+    width: 100px;
+    position: relative;
+    top: 40vh;
+}
+
+.disable-link {
+    pointer-events: none;
+}
+
+.disable-link > svg {
+    color: gray
+}
+
+.green {
+    background-color: #069C56;
+    color: white;
+    /*border-color: #069C56 !important;*/
+}
+
+.green > td, .red > td, .orange > td {
+    border: 0 !important;
+}
+
+.white,
+.green > td > a, .red > td > a, .orange > td > a {
+    color: white !important;
+}
+
+.orange {
+    background-color: #FF681E;
+    color: white !important;
+    border-color: #FF681E !important;
+}
+
+.red {
+    background-color: #D3212C;
+    color: white;
+    border-color: #D3212C !important;
+}
+
+.thead-page {
+    background-color: #f8f9fa !important;
 }

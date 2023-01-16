@@ -17,7 +17,6 @@ class PageDetailModal extends Component {
 
     render() {
         const {page} = this.props;
-        console.warn(this.props)
 
         return (
             <div>

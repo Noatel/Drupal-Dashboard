@@ -99,7 +99,7 @@ class Result(models.Model):
     group_id = models.UUIDField(null=False, editable=False)
     data = JSONField()
     status = models.CharField(max_length=50, null=False, choices=STATUS)
-    block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False, related_name='block', default=3)
+    block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False, related_name='results', default=3)
     checked = models.BooleanField(default=False)
 
     def __str__(self):

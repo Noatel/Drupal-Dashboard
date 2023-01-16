@@ -1,64 +1,52 @@
 import React, {Component} from "react";
-import PropTypes from "prop-types";
-import {connect} from "react-redux";
-import {withRouter} from "react-router-dom";
-import {getWebsites} from "./WebsiteActions";
-
-import Website from "./Website";
+import {Link} from "react-router-dom";
+import axios from "axios";
+import {toastOnError} from "../../utils/Utils";
 
 class WebsiteList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            website: {}
+            websites: {}
         };
     }
 
     componentDidMount() {
-        this.props.getWebsites();
+        axios.get("/websites/").then(response => {
+            this.setState({
+                websites: response.data
+            })
+        }).catch(error => {
+            toastOnError(error);
+        });
     }
 
-    onWebsiteClick = () => {
-        const website = this.website.value;
-        this.props.onWebsiteClick(website);
-    }
+
     render() {
-        const {websites} = this.props.websites;
-
-        if (websites.length === 0) {
+        if (this.state.websites.length > 0) {
+            let items = this.state.websites.map(website => {
+                return (
+                    <Link to={"/website/" + website.id} key={website.id}>
+                        {website.name}
+                    </Link>
+                )
+            });
             return (
                 <div className="mt-5">
-                    <h2>No websites</h2>
-                    <hr/>
+                    <h2 className="sidebar-heading">Websites</h2>
+                    {items}
                 </div>
             );
         }
 
-        let items = websites.map(website => {
-            return <Website key={website.id} website={website}  onSelectPages={this.handlePages} />;
-        });
-
         return (
             <div className="mt-5">
-                <h2 className="sidebar-heading pl-3">Websites</h2>
-                {items}
+                <h2>No websites</h2>
                 <hr/>
             </div>
         );
     }
 }
 
-WebsiteList.propTypes = {
-    getWebsites: PropTypes.func.isRequired,
-    websites: PropTypes.any,
-    website: PropTypes.object,
-};
 
-const mapStateToProps = state => ({
-    websites: state.websites,
-    website: state.website,
-});
-
-export default connect(mapStateToProps, {
-    getWebsites
-})(withRouter(WebsiteList));
+export default WebsiteList;

@@ -1,18 +1,21 @@
 import React, {Component} from "react";
-import PropTypes from "prop-types";
-import {connect} from "react-redux";
-import {withRouter} from "react-router-dom";
-import {getBlocksByPageId} from "./PageActions";
 import Table from "react-bootstrap/Table";
-import {AiFillEye,} from "react-icons/all";
+import {AiFillExperiment, AiFillEye,} from "react-icons/all";
 import Modal from "react-bootstrap/Modal";
-import SanitizedHTML from 'react-sanitized-html';
+import axios from "axios";
+import {toastOnError} from "../../utils/Utils";
+import {Spinner} from "react-bootstrap";
 
 class PageDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            show: null
+            show: null,
+            page: {
+                name: "",
+                url: "",
+            },
+            isActive:false,
         };
 
         this.handlePageDetail = this.handlePageDetail.bind(this);
@@ -21,13 +24,16 @@ class PageDetail extends Component {
     }
 
     componentDidMount() {
-        let page = this.props.page;
+        const {id} = this.props.match.params;
 
-        page.blocks.map(block => {
-            block.show = false
+        axios.get(`/pages/?page_id=${id}&blocks=true`).then(response => {
+            this.setState({
+                page: response.data[0],
+                isActive: true
+            })
+        }).catch(error => {
+            toastOnError(error);
         });
-
-        this.props.getBlocksByPageId(page.id);
     }
 
     handlePageDetail = () => {
@@ -48,11 +54,20 @@ class PageDetail extends Component {
     }
 
     render() {
-        const {page} = this.props
 
-        let blocks = page.blocks.map(block => {
+        if (!this.state.isActive) {
             return (
-                <tr key={block.id}>
+                <div className="spinner-div">
+                    <Spinner animation="border" role="status" className="spinner">
+                    </Spinner>
+                </div>
+            )
+        }
+
+        let blocks = null;
+        if (this.state.page.url !== '') {
+            blocks = this.state.page.blocks.map(block => {
+                return (<tr key={block.id}>
                     <td><p style={{textTransform: 'capitalize'}}>{block.name.split('-').join(' ')}  </p></td>
                     <td><p>{block.type}</p></td>
                     <td>
@@ -83,27 +98,23 @@ class PageDetail extends Component {
                                         {block.content[0].content}
                                     </div>
                                 </div>
-
-
                             </Modal.Body>
                         </Modal>
                     </td>
                     <td>
-
+                        <AiFillExperiment/>
                     </td>
-                </tr>
-            );
-        });
-
-
+                </tr>);
+            });
+        }
         return (
-            <div>
+            <div className="container">
                 <div className="row">
                     <div className="col-md-2">
                     </div>
                     <div className="col-md-6 mt-5">
-                        <h1>{page.name}</h1>
-                        <p>{page.url}</p>
+                        <h1>{this.state.page.name}</h1>
+                        <p>{this.state.page.url}</p>
                     </div>
                 </div>
                 <div className="row">
@@ -136,15 +147,6 @@ class PageDetail extends Component {
     }
 }
 
-PageDetail.propTypes = {
-    pages: PropTypes.object,
-    onPageDetail: PropTypes.any,
-};
 
-const mapStateToProps = state => ({
-    pages: state.page
-});
+export default PageDetail;
 
-export default connect(mapStateToProps, {
-    getBlocksByPageId
-})(withRouter(PageDetail));
