@@ -41,11 +41,11 @@ class BlockDetail extends Component {
         if (this.state.block.results.length > 0) {
             // Change to the last one in the array
             if (this.state.block.results[0].status === '1') {
-                status = 'green'
+                status = 'Nothing changed'
             } else if (this.state.block.results[0].status === '2') {
-                status = 'orange'
+                status = 'Something changed'
             } else if (this.state.block.results[0].status === '3') {
-                status = 'red'
+                status = 'Block deleted'
             }
             console.warn(this.state.block.results[0].data.content);
         }
@@ -61,7 +61,7 @@ class BlockDetail extends Component {
                             this includes the name, type of the block and the content inside it
                         </p>
                         <div className="form-group">
-                            <label htmlFor="name">Naam:</label>
+                            <label htmlFor="name">Name:</label>
                             <input type="name" className="form-control" readOnly={true} id="name"
                                    value={this.state.block.name}/>
                         </div>

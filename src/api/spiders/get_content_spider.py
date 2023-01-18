@@ -23,6 +23,11 @@ class ContentSpider(scrapy.Spider):
         self.url_position = 0
         self.urls = urls
 
+        print(self.start_urls,
+              self.start_url,
+              self.url_position,
+              self.urls)
+
     def parse(self, response, **kwargs):
         """
         This function will receive a response from the scrapy webscraper.
@@ -32,11 +37,15 @@ class ContentSpider(scrapy.Spider):
         :param response: The response the scraper gets from the webpage
         """
         page = self.urls[self.url_position]
-
+        print(response)
+        print('pagepagepagepagepagepagepagepagepagepage')
+        print(page)
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
         blocks = filter_blocks(response=response)
 
+        print('blocksssssss')
+        print(blocks)
         for block in blocks:
             # Get the block name and type based their classes
             soup = BeautifulSoup(block, "html.parser")
@@ -83,4 +92,3 @@ def filter_blocks(response):
             :return Array of Drupal blocks
     """
     return response.xpath("//*[contains(@id,'block') and contains(@class, 'block-custom-block-class')]").extract()
-

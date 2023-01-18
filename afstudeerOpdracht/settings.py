@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
  "*"
 ]
+
 
 MEDIA_URL = '/media/'
 
@@ -99,6 +101,14 @@ DATABASES = {
         'OPTIONS': {'sslmode': 'require'} if POSTGRES_SSLMODE else {},
     },
 }
+
+
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'testDatabase'
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -224,3 +234,7 @@ STATIC_ROOT = BASE_DIR / 'django_static'
 
 CELERY_BROKER_URL = 'amqp://rabbitmq'
 
+TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_OUTPUT_VERBOSE = 2
+TEST_OUTPUT_DESCRIPTIONS = True
+TEST_OUTPUT_FILE_NAME = 'junit.xml'

@@ -101,56 +101,56 @@ class PageList extends Component {
         return (
             <div>
                 <div className="container">
-                        <div>
-                            <div className="row">
-                                <div className="col-md-2">
-                                </div>
-                                <div className="col-md-6 mt-5">
-                                    <h1>{website.name}</h1>
-                                    <p>{website.description}</p>
-                                </div>
-                                <div className="col-md-4 mt-5">
-                                    <img src={website.image} alt=""/>
-                                </div>
+                    <div>
+                        <div className="row">
+                            <div className="col-md-2">
                             </div>
-                            <div className="row">
-                                <div className="col-md-2">
-                                </div>
-
-                                <div className="col-md-10 mt-5">
-                                    <h2 className="d-inline-block">Pages:</h2>
-                                    <Button
-                                        className="float-right"
-                                        variant="primary"
-                                        disabled={false}
-                                        onClick={this.handleClick}
-                                        value={website.id}
-                                    >
-                                        Schedule a test
-                                    </Button>
-
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <Table striped bordered hover>
-                                                <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>URL</th>
-                                                    <th>Edit</th>
-                                                    <th>View</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {items}
-                                                </tbody>
-                                            </Table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr/>
+                            <div className="col-md-6 mt-5">
+                                <h1>{website.name}</h1>
+                                <p>{website.description}</p>
+                            </div>
+                            <div className="col-md-4 mt-5">
+                                <img className="logo" src={website.image} alt=""/>
                             </div>
                         </div>
+                        <div className="row">
+                            <div className="col-md-2">
+                            </div>
+
+                            <div className="col-md-10 mt-5">
+                                <h2 className="d-inline-block">Pages:</h2>
+                                <Button
+                                    className="float-right"
+                                    variant="primary"
+                                    disabled={false}
+                                    onClick={this.handleClick}
+                                    value={website.id}
+                                >
+                                    Schedule a test
+                                </Button>
+
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <Table striped bordered hover>
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>URL</th>
+                                                <th>Edit</th>
+                                                <th>View</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {items}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+                        </div>
                     </div>
+                </div>
             </div>
         );
     }

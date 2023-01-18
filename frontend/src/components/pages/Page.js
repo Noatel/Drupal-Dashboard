@@ -156,12 +156,12 @@ class Page extends Component {
                             this includes currently the Drupal custom blocks and their tests
                         </p>
                         <div className="form-group">
-                            <label htmlFor="name">Naam:</label>
+                            <label htmlFor="name">Name:</label>
                             <input type="name" className="form-control" readOnly={true} id="name"
                                    value={this.state.page.name}/>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="url">url:</label>
+                            <label htmlFor="url">Url:</label>
                             <input type="url" className="form-control" readOnly={true} id="url"
                                    value={this.state.page.url}/>
                         </div>

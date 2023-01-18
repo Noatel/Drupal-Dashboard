@@ -98,7 +98,7 @@ class WebsiteDetail extends Component {
                         style={{textTransform: 'capitalize'}}>{page.name ? page.name.split('-').join(' ') : "None"}  </p>
                     </td>
                     <td><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
-                    <td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>
+                    {/*<td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>*/}
                     <td>
                         <Link to={"/page/" + page.id} key={page.id} page={page}>
                             <AiFillEye/>
@@ -121,7 +121,7 @@ class WebsiteDetail extends Component {
                                 <p>{this.state.website.description}</p>
                             </div>
                             <div className="col-md-4 mt-5">
-                                <img src={this.state.website.image} alt=""/>
+                                <img className="logo" src={this.state.website.image} alt=""/>
                             </div>
                         </div>
                         <div className="row">
@@ -147,7 +147,7 @@ class WebsiteDetail extends Component {
                                             <tr>
                                                 <th>Name</th>
                                                 <th>URL</th>
-                                                <th>Edit</th>
+                                                {/*<th>Edit</th>*/}
                                                 <th>View</th>
                                             </tr>
                                             </thead>

@@ -110,3 +110,7 @@
 .thead-page {
     background-color: #f8f9fa !important;
 }
+.logo{
+    border: 1px solid black;
+    float:right;
+}

@@ -31,6 +31,7 @@ class SitemapSpider(scrapy.Spider):
 
     def parse(self, response, **kwargs):
         links = response.text.split('\n')
+
         for link in links:
             # Searching for <loc> and </loc> element
             # When found, strip and get the link
@@ -46,3 +47,5 @@ class SitemapSpider(scrapy.Spider):
                     name=link.rsplit('/', 1)[-1],
                     website_id=self.website_id
                 )
+
+        return response
