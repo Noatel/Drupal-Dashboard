@@ -2,9 +2,8 @@ import unittest
 
 import django
 
-from src.api.models import Website, Page, Block
+from src.api.models import Website, Page, Block, Content
 from src.api.spiders.get_content_spider import ContentSpider
-from src.api.spiders.get_sitemap_spider import SitemapSpider
 from src.api.tests.responses import fake_response
 
 
@@ -44,7 +43,7 @@ class ContentCrawlerTest(django.test.TestCase):
         pages = website.pages.filter(website=self.website)
 
         # Initialize the spider
-        self.content_spider = ContentSpider(urls=pages)
+        self.spider = ContentSpider(urls=pages)
 
     def test_content_crawler(self):
         """
@@ -56,14 +55,19 @@ class ContentCrawlerTest(django.test.TestCase):
 
         # Check if there aren't any blocks in the database
         blocks = Block.objects.all()
+        content = Content.objects.all()
+
         self.assertEqual(0, blocks.__len__())
+        self.assertEqual(0, content.__len__())
 
         # Mock the response
         response = fake_response(file_name='html/typify.html', url='https://www.typify.com')
 
         # Activate the spider
-        item = self.content_spider.parse(response)
+        item = self.spider.parse(response, testing=True)
 
-        print('content block')
         blocks = Block.objects.all()
-        self.assertNotEqual(0, blocks.__len__())
+        content = Content.objects.all()
+
+        self.assertEqual(9, blocks.__len__())
+        self.assertEqual(9, content.__len__())

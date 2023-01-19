@@ -1,9 +1,7 @@
 import logging
-import re
-import uuid
 
 import scrapy
-from src.api.models import Block, Content, Page
+from src.api.models import Block, Content
 from bs4 import BeautifulSoup
 
 
@@ -11,6 +9,7 @@ class ContentSpider(scrapy.Spider):
     name = 'Content spider'
 
     def __init__(self, *args, **kwargs):
+
         # Disable the logging (Not needed)
         logging.getLogger('scrapy').propagate = False
 
@@ -23,29 +22,13 @@ class ContentSpider(scrapy.Spider):
         self.url_position = 0
         self.urls = urls
 
-        print(self.start_urls,
-              self.start_url,
-              self.url_position,
-              self.urls)
-
     def parse(self, response, **kwargs):
-        """
-        This function will receive a response from the scrapy webscraper.
-        When he got the response, filter for a block and save it to the database.
-        After saving the blocks and their contents, go to the next page.
 
-        :param response: The response the scraper gets from the webpage
-        """
         page = self.urls[self.url_position]
-        print(response)
-        print('pagepagepagepagepagepagepagepagepagepage')
-        print(page)
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
         blocks = filter_blocks(response=response)
 
-        print('blocksssssss')
-        print(blocks)
         for block in blocks:
             # Get the block name and type based their classes
             soup = BeautifulSoup(block, "html.parser")
@@ -75,12 +58,24 @@ class ContentSpider(scrapy.Spider):
             self.url_position += 1
 
             try:
-                next_url = response.urljoin(self.urls[self.url_position].url)
+                url = response.urljoin(self.urls[self.url_position].url)
 
-                # Yield the request to the next page which call this function again.
-                yield scrapy.Request(next_url, callback=self.parse)
+                # If the function kwargs got the variable "testing"
+                if kwargs.get('testing') is True:
+                    scrapy.Request(url, callback=self.parse)
+                else:
+                    next_url(self.parse, url)
+
             except IndexError:
                 pass
+
+        return response
+
+
+def next_url(parse, url):
+    # Since unit testing doesn't like yielding in the test, it needs
+    # to be in another function
+    yield scrapy.Request(url, callback=parse)
 
 
 def filter_blocks(response):

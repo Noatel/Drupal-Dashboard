@@ -20,7 +20,6 @@ def fake_response(file_name=None, url=None):
         file_content = open(file_path, 'r').read()
     else:
         file_content = ''
-
     response = TextResponse(url=url, request=request, body=file_content,
                             encoding='utf-8')
     return response

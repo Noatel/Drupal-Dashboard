@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'djoser',
-    'django_celery_beat'
+    'django_celery_beat',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
