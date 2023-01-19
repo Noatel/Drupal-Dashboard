@@ -7,7 +7,7 @@ from src.api.spiders.get_content_spider import ContentSpider
 from src.api.tests.responses import fake_response
 
 
-class ContentCrawlerTest(django.test.TestCase):
+class ContentSpiderTest(django.test.TestCase):
     def setUp(self):
         # Prep the data
 
