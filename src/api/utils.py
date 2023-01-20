@@ -19,6 +19,7 @@ def get_sitemap(website: Website):
     """
     # Go to the sitemap using Scrapy
     spider = CrawlerProcess()
+    spider.settings
     spider.crawl(SitemapSpider, url=website.url)
     spider.start()
 
@@ -88,7 +89,7 @@ def check_for_deleted_blocks(website: Website):
     :return: If there is an deleted record, give back an array of results
     """
     # get all the pages based on the given url
-    pages = website.pages.filter(website=website).distinct('url')
+    pages = website.pages.filter(website=website)
 
     # Loop through the pages
     for page in pages:

@@ -11,19 +11,12 @@ def check_for_scans():
     """Check for tasks that haven't started yet """
     scans = Scan.objects.filter(completed_at=None)
 
-    print('currently {} scans found'.format(len(scans)))
     for scan in scans:
-        print('setting the started time')
         scan.started_at = datetime.now()
         scan.save(update_fields=['started_at'])
-
-        print('scanned to the object, save')
-
-        print('run check live blocks')
         websiteId = scan.website.id
         check_live_blocks(websiteId=websiteId).delay()
 
-        print('Set completed_at to scan')
         scan.completed_at = datetime.now()
         scan.save()
         scan.save(update_fields=['completed_at'])
