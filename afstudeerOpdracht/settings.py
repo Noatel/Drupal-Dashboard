@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,23 +26,33 @@ SECRET_KEY = 'django-insecure-zmz_+njux90svs3#0ed9gjxl1&p8iw2@p$qh5=ig^c$x$5d%5)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+ "*"
+]
+
 
 MEDIA_URL = '/media/'
 
 # Application definition
 
 INSTALLED_APPS = [
-    'src.website',
+    'src.api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'djoser',
+    'django_celery_beat',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -91,6 +102,14 @@ DATABASES = {
         'OPTIONS': {'sslmode': 'require'} if POSTGRES_SSLMODE else {},
     },
 }
+
+
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'testDatabase'
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -160,3 +179,63 @@ EXTENSIONS = {
     'scrapy.telnet.TelnetConsole': None,
     'afstudeerOpdracht.extension.CustomLogExtension': 1,
 }
+
+
+CORS_ALLOW_ALL_ORIGINS=True # Add this line too
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8000',
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
+
+REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.TokenAuthentication',
+        ),
+        'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticated',
+        ]
+}
+
+ROOT_URLCONF = 'afstudeerOpdracht.urls'
+
+# configure Djoser
+DJOSER = {
+    "USER_ID_FIELD": "username",
+    "LOGIN_FIELD": "email",
+    "SEND_ACTIVATION_EMAIL": True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "reset_password/{uid}/{token}",
+    'SERIALIZERS': {
+        'token_create': 'src.accounts.serializers.CustomTokenCreateSerializer',
+    }
+}
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'afstudeerOpdracht.wsgi.application'
+
+MEDIA_URL = '/media/'
+STATIC_ROOT = BASE_DIR / 'django_static'
+
+CELERY_BROKER_URL = 'amqp://rabbitmq'
+
+TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_OUTPUT_VERBOSE = 2
+TEST_OUTPUT_DESCRIPTIONS = True
+TEST_OUTPUT_FILE_NAME = 'junit.xml'
