@@ -28,7 +28,6 @@ class Login extends Component {
     };
 
     render() {
-        console.warn(123)
         return (
             <div className="container">
                 <div className="row">

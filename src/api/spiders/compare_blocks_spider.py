@@ -1,7 +1,5 @@
 import logging
-import re
 import uuid
-from typing import List
 
 import scrapy
 from src.api.models import Block, Content, Page, Website, Result
@@ -73,17 +71,7 @@ class CompareSpider(scrapy.Spider):
 
             url = response.urljoin(self.urls[self.url_position].url)
 
-            # If the function kwargs got the variable "testing"
-            if kwargs.get('testing') is True:
-                scrapy.Request(url, callback=self.parse)
-            else:
-                next_url(self.parse, url)
-
-
-def next_url(parse, url):
-    # Since unit testing doesn't like yielding in the test, it needs
-    # to be in another function
-    yield scrapy.Request(url, callback=parse)
+            yield scrapy.Request(url, callback=self.parse)
 
 
 def create_result(status, block_id: uuid, live_block: str, group_id: uuid) -> Result:

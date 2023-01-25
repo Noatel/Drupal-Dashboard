@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Nav} from "react-bootstrap";
-import WebsiteList from "./website/WebsiteList";
+import {Link} from "react-router-dom";
 
 
 class SideBar extends Component {
@@ -10,7 +10,14 @@ class SideBar extends Component {
                 className="col-md-2 d-none d-md-block bg-light sidebar pl-4"
                 activeKey="/home"
                 onSelect={selectedKey => alert(`selected ${selectedKey}`)}>
-                <WebsiteList/>
+                <img src="/logo.png" alt="Typify"/>
+                {/*<WebsiteList/>*/}
+
+                <div className="mt-5">
+                    <Link to={"/clients"} key={1}>
+                        Clients
+                    </Link>
+                </div>
             </Nav>
         );
     }

@@ -102,6 +102,8 @@ class Result(models.Model):
     block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False, related_name='results', default=3)
     checked = models.BooleanField(default=False)
 
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
+
     def __str__(self):
         return self.status
 
@@ -116,5 +118,3 @@ class Scan(models.Model):
     scheduled_at = models.DateTimeField(blank=True, null=True)
     started_at = models.DateTimeField(blank=True, null=True)
     completed_at = models.DateTimeField(blank=True, null=True)
-
-

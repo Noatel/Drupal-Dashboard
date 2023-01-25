@@ -15,7 +15,7 @@ class PageDetail extends Component {
                 name: "",
                 url: "",
             },
-            isActive:false,
+            isActive: false,
         };
 
         this.handlePageDetail = this.handlePageDetail.bind(this);
@@ -54,7 +54,6 @@ class PageDetail extends Component {
     }
 
     render() {
-
         if (!this.state.isActive) {
             return (
                 <div className="spinner-div">
@@ -68,43 +67,44 @@ class PageDetail extends Component {
         if (this.state.page.url !== '') {
             blocks = this.state.page.blocks.map(block => {
                 return (<tr key={block.id}>
-                    <td><p style={{textTransform: 'capitalize'}}>{block.name.split('-').join(' ')}  </p></td>
-                    <td><p>{block.type}</p></td>
-                    <td>
-                        <a href="/" onClick={(event) => {
-                            event.preventDefault();
-                            this.handleShow(block.id)
-                        }}>
-                            <AiFillEye/>
-                        </a>
+                        <td><p style={{textTransform: 'capitalize'}}>{block.name.split('-').join(' ')}  </p></td>
+                        <td><p>{block.type}</p></td>
+                        <td>
+                            <a href="/" onClick={(event) => {
+                                event.preventDefault();
+                                this.handleShow(block.id)
+                            }}>
+                                <AiFillEye/>
+                            </a>
 
-                        <Modal show={this.state.show === block.id}
-                               onHide={this.handleClose}
-                               dialogClassName="modal-90w"
-                               className="modal"
-                               aria-labelledby="example-custom-modal-styling-title"
-                               fullscreen='sm-down'>
-                            <Modal.Header closeButton>
-                                <Modal.Title id="example-custom-modal-styling-title">
-                                    Custom Modal Styling
-                                </Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div dangerouslySetInnerHTML={{__html: block.content[0].content}}/>
+                            <Modal show={this.state.show === block.id}
+                                   onHide={this.handleClose}
+                                   dialogClassName="modal-90w"
+                                   className="modal"
+                                   aria-labelledby="example-custom-modal-styling-title"
+                                   fullscreen='sm-down'>
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Custom Modal Styling
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <div className="row">
+                                        <div className="col-md-6">
+
+                                        </div>
+                                        <div className="col-md-6" style={{whiteSpace: 'pre-wrap'}}>
+                                            {block.content[0].content}
+                                        </div>
                                     </div>
-                                    <div className="col-md-6" style={{whiteSpace: 'pre-wrap'}}>
-                                        {block.content[0].content}
-                                    </div>
-                                </div>
-                            </Modal.Body>
-                        </Modal>
-                    </td>
-                    <td>
-                        <AiFillExperiment/>
-                    </td>
-                </tr>);
+                                </Modal.Body>
+                            </Modal>
+                        </td>
+                        <td>
+                            <AiFillExperiment/>
+                        </td>
+                    </tr>
+                );
             });
         }
         return (

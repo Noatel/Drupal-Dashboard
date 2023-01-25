@@ -64,7 +64,8 @@ class CompareSpiderTest(django.test.TestCase):
         response = fake_response(file_name='html/typify.html', url='https://www.typify.com')
 
         # Activate the spider
-        item = self.spider_content.parse(response, testing=True)
+        item = self.spider_content.parse(response)
+        item = list(item)
 
         blocks = Block.objects.all()
         content = Content.objects.all()
@@ -78,7 +79,8 @@ class CompareSpiderTest(django.test.TestCase):
 
         # Now we going to change the html file to the other mock file
         response = fake_response(file_name='html/typify_deleted.html', url='https://www.typify.com')
-        item = self.spider_compare.parse(response, testing=True)
+        item = self.spider_compare.parse(response)
+        item = list(item)
 
         # Check for test results
         results = Result.objects.all()
@@ -141,7 +143,8 @@ class CompareSpiderTest(django.test.TestCase):
         response = fake_response(file_name='html/typify.html', url='https://www.typify.com')
 
         # Activate the spider
-        item = self.spider_content.parse(response, testing=True)
+        item = self.spider_content.parse(response)
+        item = list(item)
 
         blocks = Block.objects.all()
         content = Content.objects.all()
@@ -155,7 +158,8 @@ class CompareSpiderTest(django.test.TestCase):
 
         # Now we going to change the html file to the other mock file
         response = fake_response(file_name='html/typify_changed_and_deleted.html', url='https://www.typify.com')
-        item = self.spider_compare.parse(response, testing=True)
+        item = self.spider_compare.parse(response)
+        item = list(item)
 
         # Check for test results
         results = Result.objects.all()

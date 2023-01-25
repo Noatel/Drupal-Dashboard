@@ -64,7 +64,8 @@ class ContentSpiderTest(django.test.TestCase):
         response = fake_response(file_name='html/typify.html', url='https://www.typify.com')
 
         # Activate the spider
-        item = self.spider.parse(response, testing=True)
+        result = self.spider.parse(response)
+        result = list(result)
 
         blocks = Block.objects.all()
         content = Content.objects.all()

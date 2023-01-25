@@ -47,5 +47,3 @@ class SitemapSpider(scrapy.Spider):
                     name=link.rsplit('/', 1)[-1],
                     website_id=self.website_id
                 )
-
-        return response

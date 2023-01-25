@@ -17,6 +17,7 @@ import Page from "./components/pages/Page";
 import WebsiteDetail from "./components/website/WebsiteDetail";
 import Root from "./Root";
 import BlockDetail from "./components/blocks/BlockDetail";
+import ClientsList from "./components/clients/ClientList";
 
 export const baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.baseURL = baseURL;
@@ -44,7 +45,9 @@ class App extends Component {
                     <Route path="/website/:id" component={WebsiteDetail}/>
                     <Route path="/page/:id" component={Page}/>
                     <Route path="/page/:id/detail" component={PageDetail}/>
+                    <Route path="/page/:id/detail" component={PageDetail}/>
                     <Route path="/block/:id/results" component={BlockDetail}/>
+                    <Route path="/clients" component={ClientsList}/>
                 </Root>
             </div>
 

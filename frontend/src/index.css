@@ -110,7 +110,30 @@
 .thead-page {
     background-color: #f8f9fa !important;
 }
-.logo{
+
+.logo {
     border: 1px solid black;
-    float:right;
+    float: right;
 }
+
+.breadcrumb {
+    background-color: white !important;
+    padding-left: 0px !important;
+
+}
+
+.tableData {
+    height: 50px;
+    width: 50px;
+}
+
+.tableData svg {
+    text-align: center;
+    width: 50px;
+    vertical-align: middle;
+}
+
+.tableBlock > td > p , .tableBlock > th {
+    margin-left:10px;
+}
+

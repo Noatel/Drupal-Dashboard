@@ -33,7 +33,6 @@ class WebsiteList extends Component {
             });
             return (
                 <div className="mt-5">
-                    <h2 className="sidebar-heading">Websites</h2>
                     {items}
                 </div>
             );
