@@ -1,5 +1,4 @@
 import logging
-
 import scrapy
 from src.api.models import Block, Content
 from bs4 import BeautifulSoup
@@ -21,13 +20,14 @@ class ContentSpider(scrapy.Spider):
         self.start_url = urls[0].url
         self.url_position = 0
         self.urls = urls
+        self.testing = False
 
     def parse(self, response, **kwargs):
-
         page = self.urls[self.url_position]
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
         blocks = filter_blocks(response=response)
+        print('page name: {}'.format(page.url))
 
         for block in blocks:
             # Get the block name and type based their classes
@@ -56,26 +56,11 @@ class ContentSpider(scrapy.Spider):
 
             # Add a plus one to go to the next iteration
             self.url_position += 1
-
             try:
                 url = response.urljoin(self.urls[self.url_position].url)
-
-                # If the function kwargs got the variable "testing"
-                if kwargs.get('testing') is True:
-                    scrapy.Request(url, callback=self.parse)
-                else:
-                    next_url(self.parse, url)
-
+                yield scrapy.Request(url, callback=self.parse)
             except IndexError:
                 pass
-
-        return response
-
-
-def next_url(parse, url):
-    # Since unit testing doesn't like yielding in the test, it needs
-    # to be in another function
-    yield scrapy.Request(url, callback=parse)
 
 
 def filter_blocks(response):

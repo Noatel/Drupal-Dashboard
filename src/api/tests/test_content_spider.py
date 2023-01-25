@@ -7,7 +7,7 @@ from src.api.spiders.get_content_spider import ContentSpider
 from src.api.tests.responses import fake_response
 
 
-class ContentCrawlerTest(django.test.TestCase):
+class ContentSpiderTest(django.test.TestCase):
     def setUp(self):
         # Prep the data
 
@@ -64,7 +64,8 @@ class ContentCrawlerTest(django.test.TestCase):
         response = fake_response(file_name='html/typify.html', url='https://www.typify.com')
 
         # Activate the spider
-        item = self.spider.parse(response, testing=True)
+        result = self.spider.parse(response)
+        result = list(result)
 
         blocks = Block.objects.all()
         content = Content.objects.all()

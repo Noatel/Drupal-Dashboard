@@ -9,15 +9,17 @@ class ContentSerializer(serializers.ModelSerializer):
 
 
 class ResultSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
     class Meta:
         model = Result
-        fields = ['id', 'status', 'data']
+        fields = ['id', 'status', 'data', 'created_at']
 
 
 class ResultSerializerWithoutData(serializers.ModelSerializer):
     class Meta:
         model = Result
-        fields = ['id', 'status']
+        fields = ['id', 'status', 'created_at']
 
 
 class BlockSerializer(serializers.ModelSerializer):

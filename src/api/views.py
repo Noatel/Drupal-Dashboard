@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from src.api.models import Website, Page, Block
 from src.api.serializers import WebsiteSerializer, PageSerializer, BlockSerializer
 from rest_framework.response import Response
+
+from src.api.tasks import hello
 from src.api.utils import schedule_website
 
 
@@ -69,4 +71,7 @@ class BlockViewSet(viewsets.ModelViewSet):
     serializer_class = BlockSerializer
 
     def get_queryset(self):
+        hello()
+        blocks = self.queryset.filter()
+
         return self.queryset.filter()

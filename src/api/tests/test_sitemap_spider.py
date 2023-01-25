@@ -7,7 +7,7 @@ from src.api.spiders.get_sitemap_spider import SitemapSpider
 from src.api.tests.responses import fake_response
 
 
-class SitemapCrawlerTest(django.test.TestCase):
+class SitemapSpiderTest(django.test.TestCase):
     def setUp(self):
         # Since its a different database
         # You need to make a new website

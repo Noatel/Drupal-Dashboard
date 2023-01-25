@@ -19,6 +19,7 @@ def get_sitemap(website: Website):
     """
     # Go to the sitemap using Scrapy
     spider = CrawlerProcess()
+    spider.settings
     spider.crawl(SitemapSpider, url=website.url)
     spider.start()
 
@@ -66,11 +67,9 @@ def check_live_blocks(websiteId: uuid.UUID):
     # Because we need to get the new content blocks from the components
     # and compare it with the old content blocks
 
-    print('check the pages')
     website = Website.objects.filter(id=websiteId).first()
     pages = list(website.pages.filter(website=website).distinct('url'))
 
-    print('the page amount is {}'.format(len(pages)))
     if pages:
         print('start crawling')
         spider = CrawlerProcess()
@@ -88,7 +87,7 @@ def check_for_deleted_blocks(website: Website):
     :return: If there is an deleted record, give back an array of results
     """
     # get all the pages based on the given url
-    pages = website.pages.filter(website=website).distinct('url')
+    pages = website.pages.filter(website=website)
 
     # Loop through the pages
     for page in pages:

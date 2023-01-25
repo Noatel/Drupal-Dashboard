@@ -1,7 +1,5 @@
 import logging
-import re
 import uuid
-from typing import List
 
 import scrapy
 from src.api.models import Block, Content, Page, Website, Result
@@ -71,10 +69,9 @@ class CompareSpider(scrapy.Spider):
             # Add a plus one to go to the next iteration
             self.url_position += 1
 
-            next_url = response.urljoin(self.urls[self.url_position].url)
+            url = response.urljoin(self.urls[self.url_position].url)
 
-            # Yield the request to the next page which call this function again.
-            yield scrapy.Request(next_url, callback=self.parse)
+            yield scrapy.Request(url, callback=self.parse)
 
 
 def create_result(status, block_id: uuid, live_block: str, group_id: uuid) -> Result:
