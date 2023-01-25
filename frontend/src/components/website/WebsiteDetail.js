@@ -1,10 +1,10 @@
 import React, {Component} from "react";
 import {Link} from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import {Button, Spinner} from "react-bootstrap";
+import {Breadcrumb, Button, Spinner} from "react-bootstrap";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {AiFillEye, AiOutlineLink, BsFillPencilFill} from "react-icons/all";
+import {AiFillEye, AiOutlineLink} from "react-icons/all";
 
 class WebsiteDetail extends Component {
     constructor(props) {
@@ -116,6 +116,10 @@ class WebsiteDetail extends Component {
                             <div className="col-md-2">
                             </div>
                             <div className="col-md-6 mt-5">
+                                <Breadcrumb>
+                                    <Breadcrumb.Item onClick={this.props.history.goBack}>Clients</Breadcrumb.Item>
+                                    <Breadcrumb.Item active>Website details</Breadcrumb.Item>
+                                </Breadcrumb>
 
                                 <h1>{this.state.website.name}</h1>
                                 <p>{this.state.website.description}</p>
