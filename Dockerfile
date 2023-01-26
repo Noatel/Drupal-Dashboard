@@ -18,8 +18,8 @@ USER root
 RUN mkdir /app
 WORKDIR /app
 
-COPY requirements.txt /app/
+COPY requirements.txt /app
 RUN pip install -r requirements.txt
 
-COPY . /app/
+COPY . /app
 RUN chmod -R 777 /app

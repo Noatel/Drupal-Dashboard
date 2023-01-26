@@ -6,6 +6,7 @@ from src.api.models import Website, Page, Result, Block, Scan
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
+from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
 from src.api.spiders.get_sitemap_spider import SitemapSpider
@@ -71,7 +72,6 @@ def check_live_blocks(websiteId: uuid.UUID):
     pages = list(website.pages.filter(website=website).distinct('url'))
 
     if pages:
-        print('start crawling')
         spider = CrawlerProcess()
         spider.crawl(CompareSpider, urls=pages)
         spider.start()
@@ -128,3 +128,14 @@ def schedule_website(websiteId: uuid.UUID):
     )
 
     return schedule
+
+
+def check_for_sitemap(websiteId: uuid.UUID):
+    """
+       This function will check for a sitemap for the assign components
+       :param websiteId: Give the components you want to check for a sitemap
+       """
+    website = Website.objects.filter(id=websiteId).first()
+    spider = CrawlerProcess()
+    spider.crawl(CheckSitemapSpider, url=website.url)
+    spider.start()

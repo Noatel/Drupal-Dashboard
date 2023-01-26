@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -117,20 +118,13 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
 # Cache settings
 
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
@@ -163,12 +157,10 @@ CUSTOM_LOG_EXTENSION = True
 EXTENSIONS = {
     'scrapy.extensions.telnet.TelnetConsole': None,
     'scrapy.telnet.TelnetConsole': None,
-    'scrapy.telnet.TelnetConsole': None,
     'afstudeerOpdracht.extension.CustomLogExtension': 1,
 }
 
-
-CORS_ALLOW_ALL_ORIGINS=True # Add this line too
+CORS_ALLOW_ALL_ORIGINS = True  # Add this line too
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
@@ -176,13 +168,14 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:3000"
 ]
 
+
 REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.TokenAuthentication',
-        ),
-        'DEFAULT_PERMISSION_CLASSES': [
-            'rest_framework.permissions.IsAuthenticated',
-        ]
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
 
 ROOT_URLCONF = 'afstudeerOpdracht.urls'

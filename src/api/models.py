@@ -101,7 +101,6 @@ class Result(models.Model):
     status = models.CharField(max_length=50, null=False, choices=STATUS)
     block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False, related_name='results', default=3)
     checked = models.BooleanField(default=False)
-
     created_at = models.DateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
@@ -117,4 +116,17 @@ class Scan(models.Model):
 
     scheduled_at = models.DateTimeField(blank=True, null=True)
     started_at = models.DateTimeField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+
+
+class Checklist(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True, related_name='checklist', default=3)
+
+
+class Task(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    check_list = models.ForeignKey(Checklist, on_delete=models.CASCADE, null=True, related_name='task', default=3)
+
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
     completed_at = models.DateTimeField(blank=True, null=True)
