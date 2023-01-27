@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from src.api.models import Website, Page, Block
 from src.api.serializers import WebsiteSerializer, PageSerializer, BlockSerializer
 from rest_framework.response import Response
-from src.api.utils import schedule_website, check_for_sitemap
+from src.api.utils import schedule_website
 
 
 class WebsiteViewSet(viewsets.ModelViewSet):
@@ -75,10 +75,4 @@ class BlockViewSet(viewsets.ModelViewSet):
     serializer_class = BlockSerializer
 
     def get_queryset(self):
-        if self.request.GET.get('testing'):
-            webiste = Website.objects.filter(url='https://www.typify.com').first()
-            check_for_sitemap(webiste.id)
-
-        blocks = self.queryset.filter()
-
         return self.queryset.filter()

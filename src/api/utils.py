@@ -6,7 +6,7 @@ from src.api.models import Website, Page, Result, Block, Scan
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
-from src.api.spiders.check_robots_spider import CheckForRobots
+from src.api.spiders.check_robot_spider import CheckRobotSpider
 from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
@@ -144,11 +144,10 @@ def check_for_sitemap(websiteId: uuid.UUID):
 
 def check_for_robots(websiteId: uuid.UUID):
     """
-       This function will check for a robots.txt for the assign components
+       This function will check for a sitemap for the assign components
        :param websiteId: Give the components you want to check for a sitemap
        """
     website = Website.objects.filter(id=websiteId).first()
     spider = CrawlerProcess()
-    spider.crawl(CheckForRobots, url=website.url)
+    spider.crawl(CheckRobotSpider, url=website.url)
     spider.start()
-

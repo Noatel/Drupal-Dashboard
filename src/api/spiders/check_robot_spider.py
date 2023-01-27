@@ -20,8 +20,8 @@ def format_url(url, second_url):
         return url + second_url
 
 
-class CheckSitemapSpider(scrapy.Spider):
-    name = 'Sitemap spider'
+class CheckRobotSpider(scrapy.Spider):
+    name = 'Robot.txt spider'
 
     def __init__(self, *args, **kwargs):
         # Disable the logging (Not needed)
@@ -32,7 +32,7 @@ class CheckSitemapSpider(scrapy.Spider):
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
-        sitemap_url = format_url(url, '/sitemap.xml')
+        sitemap_url = format_url(url, '/robot.txt')
 
         # Set it to a self so I can access it later
         self.start_urls = [sitemap_url]
@@ -44,42 +44,37 @@ class CheckSitemapSpider(scrapy.Spider):
 
     def parse(self, response, **kwargs):
         """
-        Function that check if the page is a sitemap based on
-        <?xml and </urlset>
-
-        Since for some reason i cant make any files otherwise docker crashes
-        The checklist is in 1 file
-
-        :param response: Response of the website, {website_url}/sitemap.xml
-        :return: Return if the sitemap exist, if it does return true otherwise false
+              Function that check if the page is a sitemap based on
+              :param response: Response of the website, {website_url}/sitemap.xml
+              :return: Return if the sitemap exist, if it does return true otherwise false
         """
+
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
         print('The status of the checklist is: {}'.format(checklist.status))
+        robots = response.text.splitlines()
+        print(robots)
 
         try:
-            if response.text[:5] == '<?xml' and ' '.join(response.text[-10:].split()) == '</urlset>':
+            if robots[2] == '# robots.txt':
                 # Based on the origin url get the checklist
                 task = Task.objects.get_or_create(
-                    type=Task.TYPE[1],
+                    type=Task.TYPE[2],
                     status=Task.STATUS[1],
                     completed_at=datetime.now(),
                     check_list=checklist,
-                    comment='Sitemap.xml found'
+                    comment='Robots.txt found'
                 )
 
-                self.status = 2
-                checklist.status = 2
+                self.status = 3
+                checklist.status = 3
                 checklist.save()
             else:
                 task = Task.objects.get_or_create(
                     type=Task.TYPE[1],
                     status=Task.STATUS[2],
                     check_list=checklist,
-                    comment="Sitemap.xml not found"
+                    comment="Robots.txt not found"
                 )
-
-            return task
-
         except Exception as e:
             task = Task.objects.get_or_create(
                 type=Task.TYPE[1],

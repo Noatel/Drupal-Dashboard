@@ -127,19 +127,26 @@ class Scan(models.Model):
 
 
 class Checklist(models.Model):
+    STATUS = ((
+        ('NOT_STARTED', _('Not started')),
+        ('SITEMAP', _('Check the sitemap.xml')),
+        ('ROBOTS', _('Check for robots.txt')),
+    ))
+    status = models.CharField(max_length=50, null=False, choices=STATUS, default=1)
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True, related_name='checklist', default=3)
 
 
 class Task(models.Model):
     TYPE = ((
-        ('NOT_ACITVE', _('Not active')),
+        ('NOT_STARTED', _('Not started')),
         ('SITEMAP', _('Sitemap')),
         ('ROBOTS', _('Robots')),
     ))
 
     STATUS = ((
-        ('NOT_ACITVE', _('Not active')),
+        ('NOT_STARTED', _('Not started')),
         ('SUCCESS', _('Success')),
         ('FAILED', _('Failed')),
     ))
