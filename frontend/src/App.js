@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import { Route} from "react-router-dom";
+import {Route} from "react-router-dom";
 import {ToastContainer} from "react-toastify";
 import Home from "./components/Home";
 import Signup from "./components/account/Signup";
@@ -18,6 +18,7 @@ import WebsiteDetail from "./components/website/WebsiteDetail";
 import Root from "./Root";
 import BlockDetail from "./components/blocks/BlockDetail";
 import ClientsList from "./components/clients/ClientList";
+import ChecklistDetail from "./components/checklist/ChecklistDetail";
 
 export const baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.baseURL = baseURL;
@@ -36,7 +37,6 @@ class App extends Component {
                     <Route path="/dashboard" component={requireAuth(Dashboard)}/>
                     <Route path="/" component={Home}/>
 
-                    <Route path="/page/:uid/detail" component={PageDetail}/>
                     <Route path="/resend_activation" component={ResendActivation}/>
                     <Route path="/activate/:uid/:token" component={ActivateAccount}/>
                     <Route path="/send_reset_password/" component={ResetPassword}/>
@@ -44,10 +44,17 @@ class App extends Component {
 
                     <Route path="/website/:id" component={WebsiteDetail}/>
                     <Route path="/page/:id" component={Page}/>
+
                     <Route path="/page/:id/detail" component={PageDetail}/>
                     <Route path="/page/:id/detail" component={PageDetail}/>
+                    <Route path="/page/:uid/detail" component={PageDetail}/>
+
+
                     <Route path="/block/:id/results" component={BlockDetail}/>
-                    <Route path="/clients" component={ClientsList}/>
+
+                    <Route exact path="/clients" component={ClientsList}/>
+                    <Route exact path="/clients/website/:id" component={ChecklistDetail}/>
+
                 </Root>
             </div>
 

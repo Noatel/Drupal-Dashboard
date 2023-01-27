@@ -3,8 +3,6 @@ from rest_framework.decorators import action
 from src.api.models import Website, Page, Block
 from src.api.serializers import WebsiteSerializer, PageSerializer, BlockSerializer
 from rest_framework.response import Response
-
-from src.api.tasks import hello
 from src.api.utils import schedule_website, check_for_sitemap
 
 
@@ -16,20 +14,26 @@ class WebsiteViewSet(viewsets.ModelViewSet):
     serializer_class = WebsiteSerializer
 
     def get_queryset(self):
-        return self.queryset.filter()
+        websites = self.queryset.filter()
 
-    def perform_create(self, serializer):
-        serializer.save()
+        return websites
 
-    @action(methods=['post'], detail=True)
-    def schedule(self, request, pk):
-        """
-        Schedule a task in based on website id
-        """
 
-        schedule = schedule_website(websiteId=pk)
+def perform_create(self, serializer):
+    serializer.save()
 
-        return Response(data='Scheduled', status=status.HTTP_201_CREATED, content_type="application/json")
+    # website/checklist/${id}
+
+
+@action(methods=['post'], detail=True)
+def schedule(self, request, pk):
+    """
+    Schedule a task in based on website id
+    """
+
+    schedule = schedule_website(websiteId=pk)
+
+    return Response(data='Scheduled', status=status.HTTP_201_CREATED, content_type="application/json")
 
 
 class PageViewSet(viewsets.ModelViewSet):

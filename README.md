@@ -72,3 +72,18 @@ Check for deleted blocks based on a given website
 ```bash
 python manage.py checkForDeletedBlocks -w "https://www.typify.com"
 ```
+
+
+## Checklist
+
+For the automation of the checklist, just like above there are a few commands
+you CAN run manual, this is going to be automated. 
+
+For the Sitemap:
+```bash
+python manage.py checkForSitemap -w "https://www.typify.com"
+```
+For Robots.txt:
+```bash
+python manage.py  -w "https://www.typify.com"
+```

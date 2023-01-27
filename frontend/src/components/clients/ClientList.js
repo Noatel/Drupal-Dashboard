@@ -43,7 +43,11 @@ class ClientsList extends Component {
                     <tr key={website.id}>
                         <td colSpan={4}>{website.name}</td>
                         <td><AiFillSetting/></td>
-                        <td><GoChecklist/></td>
+                        <td>
+                             <Link to={"/clients/website/" + website.id } key={website.id}>
+                                <GoChecklist/>
+                            </Link>
+                        </td>
                         <td>
                             <Link to={"/website/" + website.id} key={website.id}>
                                 <AiFillEye/>

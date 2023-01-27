@@ -7,7 +7,7 @@ from scrapy import Selector
 from src.api.models import Page, Website, Checklist, Task
 
 
-class CheckSitemapSpider(scrapy.Spider):
+class CheckForRobots(scrapy.Spider):
     name = 'Sitemap spider'
 
     def __init__(self, *args, **kwargs):
@@ -20,9 +20,9 @@ class CheckSitemapSpider(scrapy.Spider):
 
         # If the end url ends with a slash add sitemap else /sitemap
         if url.endswith('/'):
-            sitemap_url = url + 'sitemap.xml'
+            sitemap_url = url + 'robots.txt'
         else:
-            sitemap_url = url + '/sitemap.xml'
+            sitemap_url = url + '/robots.txt'
 
         # Set it to a self so I can access it later
         self.start_urls = [sitemap_url]
@@ -33,35 +33,11 @@ class CheckSitemapSpider(scrapy.Spider):
     def parse(self, response, **kwargs):
         """
         Function that check if the page is a sitemap based on
-        <?xml and </urlset>
-
         :param response: Response of the website, {website_url}/sitemap.xml
         :return: Return if the sitemap exist, if it does return true otherwise false
         """
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
 
-        try:
-            if response.text[:5] == '<?xml' and ' '.join(response.text[-10:].split()) == '</urlset>':
-                # Based on the origin url get the checklist
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[1],
-                    status=Task.STATUS[1],
-                    completed_at=datetime.now(),
-                    check_list=checklist,
-                    comment='Sitemap found'
-                )
-            else:
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[1],
-                    status=Task.STATUS[2],
-                    check_list=checklist,
-                    comment="Sitemap not found"
-                )
-
-        except Exception as e:
-            task = Task.objects.get_or_create(
-                type=Task.TYPE[1],
-                status=Task.STATUS[2],
-                check_list=checklist,
-                comment=str(e)
-            )
+        # try:
+        robots = dict(zip(*(line.split('|') for line in response.text.splitlines())))
+        print(robots)
