@@ -129,8 +129,11 @@ class Scan(models.Model):
 class Checklist(models.Model):
     STATUS = ((
         ('NOT_STARTED', _('Not started')),
-        ('SITEMAP', _('Check the sitemap.xml')),
-        ('ROBOTS', _('Check for robots.txt')),
+        ('SITEMAP', _('Sitemap')),
+        ('ROBOTS', _('Robots')),
+        ('METATAGS', _('Meta tags')),
+        ('GOOGLE', _('Google Analytics')),
+        ('NICEURL', _('Nice urls')),
     ))
     status = models.CharField(max_length=50, null=False, choices=STATUS, default=1)
 
@@ -143,6 +146,9 @@ class Task(models.Model):
         ('NOT_STARTED', _('Not started')),
         ('SITEMAP', _('Sitemap')),
         ('ROBOTS', _('Robots')),
+        ('METATAGS', _('Meta tags')),
+        ('GOOGLE', _('Google Analytics')),
+        ('NICEURL', _('Nice urls')),
     ))
 
     STATUS = ((
@@ -153,7 +159,7 @@ class Task(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     check_list = models.ForeignKey(Checklist, on_delete=models.CASCADE, null=True, related_name='task', default=3)
-    comment = models.CharField(max_length=50, null=True)
+    comment = models.CharField(max_length=255, null=True)
 
     type = models.CharField(max_length=50, null=False, choices=TYPE, default=1)
     status = models.CharField(max_length=50, null=False, choices=STATUS, default=1)

@@ -27,7 +27,6 @@ class ContentSpider(scrapy.Spider):
         # From the response that I get,
         # search for the DIV with the ID that starts with "block" and got a class of "block-custom"
         blocks = filter_blocks(response=response)
-        print('page name: {}'.format(page.url))
 
         for block in blocks:
             # Get the block name and type based their classes

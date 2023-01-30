@@ -54,7 +54,6 @@ class CheckSitemapSpider(scrapy.Spider):
         :return: Return if the sitemap exist, if it does return true otherwise false
         """
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
-        print('The status of the checklist is: {}'.format(checklist.status))
 
         try:
             if response.text[:5] == '<?xml' and ' '.join(response.text[-10:].split()) == '</urlset>':

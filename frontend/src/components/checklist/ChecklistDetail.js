@@ -66,6 +66,7 @@ class ChecklistDetail extends Component {
                                         <BsCircleFill/>
                                     </IconContext.Provider>
                                 </td>
+                                <td>{task.completed_at}</td>
                             </tr>
                         );
                     }
@@ -98,6 +99,7 @@ class ChecklistDetail extends Component {
                                     <th>Name</th>
                                     <th>Comment</th>
                                     <th>Status</th>
+                                    <th>Completed at</th>
                                 </tr>
                                 </thead>
                                 <tbody>

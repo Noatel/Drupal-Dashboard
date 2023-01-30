@@ -6,6 +6,10 @@ from src.api.models import Website, Page, Result, Block, Scan
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
+from src.api.spiders.check_for_minified_spider import CheckMinifySpider
+from src.api.spiders.check_google_analytics_spider import CheckGoogleAnalyticsSpider
+from src.api.spiders.check_metatag_spider import CheckMetaTagSpider
+from src.api.spiders.check_nice_urls_spider import CheckNiceUrlsSpider
 from src.api.spiders.check_robot_spider import CheckRobotSpider
 from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
@@ -36,7 +40,6 @@ def scan_page(website: Website):
     """
 
     pages = website.pages.filter(website=website).distinct('url')
-    print('{} is the amount of pages'.format(pages))
 
     if pages:
         spider = CrawlerProcess()
@@ -131,23 +134,81 @@ def schedule_website(websiteId: uuid.UUID):
     return schedule
 
 
-def check_for_sitemap(websiteId: uuid.UUID):
+def check_for_sitemap(websiteId: uuid.UUID, process: CrawlerProcess):
     """
        This function will check for a sitemap for the assign components
+       :param process:
        :param websiteId: Give the components you want to check for a sitemap
        """
     website = Website.objects.filter(id=websiteId).first()
-    spider = CrawlerProcess()
+    spider = process
     spider.crawl(CheckSitemapSpider, url=website.url)
-    spider.start()
+    # spider.start()
 
 
-def check_for_robots(websiteId: uuid.UUID):
+def check_for_robots(websiteId: uuid.UUID, process: CrawlerProcess):
     """
        This function will check for a sitemap for the assign components
+       :param process:
        :param websiteId: Give the components you want to check for a sitemap
        """
     website = Website.objects.filter(id=websiteId).first()
-    spider = CrawlerProcess()
+    spider = process
     spider.crawl(CheckRobotSpider, url=website.url)
-    spider.start()
+
+
+def check_for_metatags(websiteId: uuid.UUID, process: CrawlerProcess):
+    """
+       This function will check for the metatags, description and page title for the assign components
+       :param process:
+       :param websiteId: Give the components you want to check for a sitemap
+       """
+
+    website = Website.objects.filter(id=websiteId).first()
+    pages = website.pages.filter(website=website).distinct('url')
+
+    if pages:
+        spider = process
+        spider.crawl(CheckMetaTagSpider, urls=pages)
+
+
+def check_for_google_analytics(websiteId: uuid.UUID, process: CrawlerProcess):
+    """
+       This function will check for the google analytics for the assign components
+       :param process:
+       :param websiteId: Give the components you want to check for a sitemap
+    """
+    website = Website.objects.filter(id=websiteId).first()
+    spider = process
+    spider.crawl(CheckGoogleAnalyticsSpider, url=website.url)
+
+
+def check_for_nice_urls(websiteId: uuid.UUID, process: CrawlerProcess):
+    """
+       This function will check for a Nice URL's for the assign components
+       :param process:
+       :param websiteId: Give the components you want to check for a sitemap
+    """
+    website = Website.objects.filter(id=websiteId).first()
+    pages = website.pages.filter(website=website).distinct('url')
+
+    if pages:
+        spider = process
+        spider.crawl(CheckNiceUrlsSpider, urls=pages)
+    else:
+        print('no pages available')
+
+
+def check_all(websiteId: uuid.UUID):
+    # Call the Crawler process to start up the spiders
+    process = CrawlerProcess()
+
+    # Set up the spiders
+    check_for_sitemap(websiteId=websiteId, process=process)
+    check_for_robots(websiteId=websiteId, process=process)
+    check_for_metatags(websiteId=websiteId, process=process)
+    check_for_google_analytics(websiteId=websiteId, process=process)
+    check_for_nice_urls(websiteId=websiteId, process=process)
+
+    # Activate the spiders
+    process.start()

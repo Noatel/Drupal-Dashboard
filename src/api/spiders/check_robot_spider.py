@@ -32,11 +32,11 @@ class CheckRobotSpider(scrapy.Spider):
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
-        sitemap_url = format_url(url, '/robot.txt')
+        robot_url = format_url(url, '/robots.txt')
 
         # Set it to a self so I can access it later
-        self.start_urls = [sitemap_url]
-        self.start_url = sitemap_url
+        self.start_urls = [robot_url]
+        self.start_url = robot_url
         self.urls = []
         self.website_id = website.id
         self.website_url = website.url
@@ -50,12 +50,11 @@ class CheckRobotSpider(scrapy.Spider):
         """
 
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
-        print('The status of the checklist is: {}'.format(checklist.status))
+
         robots = response.text.splitlines()
-        print(robots)
 
         try:
-            if robots[2] == '# robots.txt':
+            if robots[1] == '# robots.txt':
                 # Based on the origin url get the checklist
                 task = Task.objects.get_or_create(
                     type=Task.TYPE[2],
@@ -70,14 +69,14 @@ class CheckRobotSpider(scrapy.Spider):
                 checklist.save()
             else:
                 task = Task.objects.get_or_create(
-                    type=Task.TYPE[1],
+                    type=Task.TYPE[2],
                     status=Task.STATUS[2],
                     check_list=checklist,
                     comment="Robots.txt not found"
                 )
         except Exception as e:
             task = Task.objects.get_or_create(
-                type=Task.TYPE[1],
+                type=Task.TYPE[2],
                 status=Task.STATUS[2],
                 check_list=checklist,
                 comment=str(e)
