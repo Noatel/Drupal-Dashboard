@@ -14,6 +14,7 @@ from src.api.spiders.check_google_analytics_spider import CheckGoogleAnalyticsSp
 from src.api.spiders.check_metatag_spider import CheckMetaTagSpider
 from src.api.spiders.check_nice_urls_spider import CheckNiceUrlsSpider
 from src.api.spiders.check_robot_spider import CheckRobotSpider
+from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
 from src.api.spiders.get_sitemap_spider import SitemapSpider
@@ -158,15 +159,9 @@ def check_all(websiteId: uuid.UUID):
     configure_logging()
     # Set up the spiders
 
-    print('------------------------')
-    print(checklist.status)
-    print(checklist.status == 3)
-    print(checklist.status == '3')
-    print('------------------------')
-
     # ('NOT_STARTED', _('Not started')),
     if checklist.status == '0':
-        run_spider(SitemapSpider, urls=[website.url])
+        run_spider(CheckSitemapSpider, urls=[website.url])
 
     # ('SITEMAP', _('Sitemap')),
     if checklist.status == '1':
