@@ -1,14 +1,25 @@
 import uuid
 from datetime import datetime
 
+from scrapy import crawler
 from scrapy.crawler import CrawlerProcess
-from src.api.models import Website, Page, Result, Block, Scan
+from scrapy.utils.log import configure_logging
+
+from twisted.internet import reactor
+from src.api.models import Website, Page, Result, Block, Scan, Checklist, Task
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
+from src.api.spiders.check_google_analytics_spider import CheckGoogleAnalyticsSpider
+from src.api.spiders.check_metatag_spider import CheckMetaTagSpider
+from src.api.spiders.check_nice_urls_spider import CheckNiceUrlsSpider
+from src.api.spiders.check_robot_spider import CheckRobotSpider
+from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
 from src.api.spiders.get_sitemap_spider import SitemapSpider
+from multiprocessing import Queue
+from billiard.context import Process
 
 
 def get_sitemap(website: Website):
@@ -34,7 +45,6 @@ def scan_page(website: Website):
     """
 
     pages = website.pages.filter(website=website).distinct('url')
-    print('{} is the amount of pages'.format(pages))
 
     if pages:
         spider = CrawlerProcess()
@@ -71,7 +81,6 @@ def check_live_blocks(websiteId: uuid.UUID):
     pages = list(website.pages.filter(website=website).distinct('url'))
 
     if pages:
-        print('start crawling')
         spider = CrawlerProcess()
         spider.crawl(CompareSpider, urls=pages)
         spider.start()
@@ -128,3 +137,68 @@ def schedule_website(websiteId: uuid.UUID):
     )
 
     return schedule
+
+
+def schedule_checklist(websiteId: uuid.UUID):
+    checklist = Checklist.objects.filter(website__id=websiteId).first()
+    tasks = Task.objects.filter(check_list_id=checklist.id)
+    for task in tasks:
+        print("{} task is deleted ".format(task.id))
+        task.delete()
+
+    checklist.status = 0
+    checklist.save()
+
+
+def check_all(websiteId: uuid.UUID):
+    # Call the Crawler process to start up the spiders
+    website = Website.objects.filter(id=websiteId).first()
+    pages = website.pages.filter(website=website).distinct('url')
+    checklist = Checklist.objects.filter(website_id=website.id).first()
+
+    configure_logging()
+    # Set up the spiders
+
+    # ('NOT_STARTED', _('Not started')),
+    if checklist.status == '0':
+        run_spider(CheckSitemapSpider, urls=[website.url])
+
+    # ('SITEMAP', _('Sitemap')),
+    if checklist.status == '1':
+        run_spider(CheckRobotSpider, urls=[website.url])
+
+    # ('ROBOTS', _('Robots')),
+    if checklist.status == '2':
+        run_spider(CheckMetaTagSpider, urls=pages)
+
+    # ('GOOGLE', _('Google Analytics')),
+    if checklist.status == '3':
+        run_spider(CheckGoogleAnalyticsSpider, urls=[website.url])
+
+    # ('METATAGS', _('Meta tags')),
+    if checklist.status == '4':
+        run_spider(CheckNiceUrlsSpider, urls=pages)
+
+    # ('COMPLETED', _('Completed')),
+
+
+def run_spider(spider, *args, **kwargs):
+    def f(q):
+        try:
+            runner = crawler.CrawlerProcess()
+
+            deferred = runner.crawl(spider, urls=kwargs.get('urls'))
+            deferred.addBoth(lambda _: reactor.stop())
+            reactor.run()
+            q.put(None)
+        except Exception as e:
+            q.put(e)
+
+    q = Queue()
+    p = Process(target=f, args=(q,))
+    p.start()
+    result = q.get()
+    p.join()
+
+    if result is not None:
+        raise result

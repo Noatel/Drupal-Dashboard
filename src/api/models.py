@@ -4,6 +4,8 @@ import uuid
 import django
 from django.db import models
 from django.db.models import JSONField
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from model_utils import Choices
 from setuptools._entry_points import _
 
@@ -21,6 +23,11 @@ class Website(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@receiver(post_save, sender=Website)
+def create_checklist(sender, instance, **kwargs):
+    checklist = Checklist.objects.get_or_create(website=instance)
 
 
 class Page(models.Model):
@@ -101,7 +108,6 @@ class Result(models.Model):
     status = models.CharField(max_length=50, null=False, choices=STATUS)
     block = models.ForeignKey(Block, on_delete=models.CASCADE, null=False, related_name='results', default=3)
     checked = models.BooleanField(default=False)
-
     created_at = models.DateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
@@ -117,4 +123,47 @@ class Scan(models.Model):
 
     scheduled_at = models.DateTimeField(blank=True, null=True)
     started_at = models.DateTimeField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+
+
+class Checklist(models.Model):
+    STATUS = ((
+        ('NOT_STARTED', _('Not started')),
+        ('SITEMAP', _('Sitemap')),
+        ('ROBOTS', _('Robots')),
+        ('METATAGS', _('Meta tags')),
+        ('GOOGLE', _('Google Analytics')),
+        ('NICEURL', _('Nice urls')),
+        ('COMPLETED', _('Completed')),
+    ))
+    status = models.CharField(max_length=50, null=False, choices=STATUS, default=1)
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True, related_name='checklist', default=3)
+
+
+class Task(models.Model):
+    TYPE = ((
+        ('NOT_STARTED', _('Not started')),
+        ('SITEMAP', _('Sitemap')),
+        ('ROBOTS', _('Robots')),
+        ('METATAGS', _('Meta tags')),
+        ('GOOGLE', _('Google Analytics')),
+        ('NICEURL', _('Nice urls')),
+    ))
+
+    STATUS = ((
+        ('NOT_STARTED', _('Not started')),
+        ('SUCCESS', _('Success')),
+        ('FAILED', _('Failed')),
+    ))
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    check_list = models.ForeignKey(Checklist, on_delete=models.CASCADE, null=True, related_name='task', default=3)
+    comment = models.CharField(max_length=255, null=True)
+
+    type = models.CharField(max_length=50, null=False, choices=TYPE, default=1)
+    status = models.CharField(max_length=50, null=False, choices=STATUS, default=1)
+
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
     completed_at = models.DateTimeField(blank=True, null=True)

@@ -35,7 +35,7 @@ django-templated-email==3.0.0
 importlib-metadata==4.13.0
 django_celery_results==2.4.0
 twisted==22.10.0
-Pillow==9.4.0
 
 django-nose==1.4.7
 coverage==7.0.5
+billiard==3.6.4.0

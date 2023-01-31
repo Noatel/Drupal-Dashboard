@@ -6,7 +6,7 @@ from scrapy import Selector
 from src.api.models import Page, Website
 
 
-class SitemapSpider(scrapy.Spider):
+class CheckSitemapSpider(scrapy.Spider):
     name = 'Sitemap spider'
 
     def __init__(self, *args, **kwargs):
@@ -31,20 +31,14 @@ class SitemapSpider(scrapy.Spider):
         self.website_id = website.id
 
     def parse(self, response, **kwargs):
-        links = response.text.split('\n')
-
-        for link in links:
-            # Searching for <loc> and </loc> element
-            # When found, strip and get the link
-            if link[:7].replace(" ", "") == '<loc>' and link[-6:].replace(" ", "") == '</loc>':
-                # Remove <loc>
-                link = link.replace(link[-6:], "")
-                # Remove </loc>
-                link = link.replace(link[:7], "")
-
-                # add the page
-                page, created = Page.objects.get_or_create(
-                    url=link,
-                    name=link.rsplit('/', 1)[-1],
-                    website_id=self.website_id
-                )
+        print(response.text)
+        xml = response.xpath('/').extract()
+        print(xml)
+        xml = response.xpath('urlset').extract()
+        print(xml)
+        xml = response.xpath('/urlset').extract()
+        print(xml)
+        # print(xml[:7].replace(" ", "") )
+        # if xml[:7].replace(" ", "") == '<?xml>':
+        #     pas
+    # return False

@@ -12,14 +12,14 @@ class SitemapSpiderTest(django.test.TestCase):
         # Since its a different database
         # You need to make a new website
         self.website = Website.objects.create(
-            url='https://www.typify.com',
+            urls='https://www.typify.com',
             name='Typify',
             description='Typify',
             image='testImage'
         )
 
         # Initialize the spider
-        self.spider = SitemapSpider(url='https://www.typify.com')
+        self.spider = SitemapSpider(urls=['https://www.typify.com'])
 
     def test_sitemap(self):
         """
