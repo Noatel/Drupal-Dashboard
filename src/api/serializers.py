@@ -57,7 +57,7 @@ class WebPageSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['id', 'status', 'type', 'comment','completed_at']
+        fields = ['id', 'status', 'type', 'comment', 'completed_at']
 
 
 class ChecklistSerializer(serializers.ModelSerializer):
@@ -65,7 +65,7 @@ class ChecklistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Checklist
-        fields = ['id', 'task']
+        fields = ['id', 'task', 'status']
 
 
 class WebsiteSerializer(serializers.ModelSerializer):

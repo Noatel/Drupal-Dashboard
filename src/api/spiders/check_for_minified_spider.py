@@ -28,7 +28,8 @@ class CheckMinifySpider(scrapy.Spider):
         logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
-        url = kwargs.get('url')
+        urls = kwargs.get('urls')
+        url = urls[0]
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
@@ -48,36 +49,3 @@ class CheckMinifySpider(scrapy.Spider):
               :param response: Response of the website, {website_url}/sitemap.xml
               :return: Return if the sitemap exist, if it does return true otherwise false
         """
-
-        checklist = Checklist.objects.filter(website__id=self.website_id).first()
-
-        robots = response.text.splitlines()
-
-        try:
-            if robots[1] == '# robots.txt':
-                # Based on the origin url get the checklist
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[2],
-                    status=Task.STATUS[1],
-                    completed_at=datetime.now(),
-                    check_list=checklist,
-                    comment='Robots.txt found'
-                )
-
-                self.status = 3
-                checklist.status = 3
-                checklist.save()
-            else:
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[2],
-                    status=Task.STATUS[2],
-                    check_list=checklist,
-                    comment="Robots.txt not found"
-                )
-        except Exception as e:
-            task = Task.objects.get_or_create(
-                type=Task.TYPE[2],
-                status=Task.STATUS[2],
-                check_list=checklist,
-                comment=str(e)
-            )

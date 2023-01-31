@@ -136,4 +136,7 @@
 .tableBlock > td > p , .tableBlock > th {
     margin-left:5px;
 }
-
+.button-checklist{
+    position: relative;
+    bottom: 50px;
+}

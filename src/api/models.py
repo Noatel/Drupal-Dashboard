@@ -134,6 +134,7 @@ class Checklist(models.Model):
         ('METATAGS', _('Meta tags')),
         ('GOOGLE', _('Google Analytics')),
         ('NICEURL', _('Nice urls')),
+        ('COMPLETED', _('Completed')),
     ))
     status = models.CharField(max_length=50, null=False, choices=STATUS, default=1)
 

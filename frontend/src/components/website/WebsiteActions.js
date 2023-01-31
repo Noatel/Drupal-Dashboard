@@ -52,6 +52,21 @@ export const scheduleWebsite = id => dispatch => {
         });
 };
 
+
+export const scheduleChecklist = id => dispatch => {
+    axios
+        .post(`/websites/${id}/checklist/`)
+        .then(response => {
+            dispatch({
+                type: ADD_website,
+                payload: response.data
+            });
+        })
+        .catch(error => {
+            toastOnError(error);
+        });
+};
+
 export const deleteWebsite = id => dispatch => {
     axios
         .delete(`/websites/${id}/`)

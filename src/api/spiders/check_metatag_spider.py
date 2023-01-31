@@ -57,11 +57,11 @@ class CheckMetaTagSpider(scrapy.Spider):
 
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
         meta_description = response.xpath("//meta[@name='description']/@content").extract()
+        check_description = len(meta_description) > 0
 
         if meta_description:
             meta_description = meta_description[0]
         else:
-            check_description = len(meta_description) > 0
             if check_description:
                 self.check_description = check_description
                 self.descriptions.append(self.start_url)
@@ -90,8 +90,7 @@ class CheckMetaTagSpider(scrapy.Spider):
                 checklist.status = 3
                 checklist.save()
             # IF the meta description OR the title is empty
-            elif check_title and self.url_position == (
-                    len(self.urls) - 1) or check_description and self.url_position == (len(self.urls) - 1):
+            elif check_title and self.url_position == (len(self.urls) - 1) or check_description and self.url_position == (len(self.urls) - 1):
                 comment = "['description not found']" if self.check_description else "['title tag not found']"
                 comment += self.titles
                 comment += self.descriptions
@@ -103,7 +102,7 @@ class CheckMetaTagSpider(scrapy.Spider):
                 )
         except Exception as e:
             task = Task.objects.get_or_create(
-                type=Task.TYPE[1],
+                type=Task.TYPE[3],
                 status=Task.STATUS[2],
                 check_list=checklist,
                 comment=str(e)

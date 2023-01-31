@@ -14,7 +14,8 @@ class SitemapSpider(scrapy.Spider):
         logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
-        url = kwargs.get('url')
+        urls = kwargs.get('urls')
+        url = urls[0]
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
@@ -28,8 +29,10 @@ class SitemapSpider(scrapy.Spider):
         self.start_url = sitemap_url
         self.urls = []
         self.website_id = website.id
+        print('init deze shit?!?!')
 
     def parse(self, response, **kwargs):
+        print('goed je bent erin !!!')
         links = response.text.split('\n')
 
         for link in links:

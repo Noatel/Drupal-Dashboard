@@ -28,7 +28,8 @@ class CheckSitemapSpider(scrapy.Spider):
         logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
-        url = kwargs.get('url')
+        urls = kwargs.get('urls')
+        url = urls[0]
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap

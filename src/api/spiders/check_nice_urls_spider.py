@@ -81,8 +81,8 @@ class CheckNiceUrlsSpider(scrapy.Spider):
                     comment='Only Nice URL found on the website'
                 )
 
-                self.status = 4
-                checklist.status = 4
+                self.status = 5
+                checklist.status = 5
                 checklist.save()
             # IF there is a matching
             elif len(matching) > 0 and self.url_position == (len(self.urls) - 1):

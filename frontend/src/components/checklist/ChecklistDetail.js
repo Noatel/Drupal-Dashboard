@@ -1,11 +1,14 @@
 import React, {Component} from "react";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {Breadcrumb, ListGroup, Spinner} from "react-bootstrap";
+import {Breadcrumb, Button, ListGroup, Spinner} from "react-bootstrap";
 import {withRouter} from "react-router-dom";
 import Table from "react-bootstrap/Table";
 import {BsCircleFill} from "react-icons/all";
 import {IconContext} from "react-icons";
+import {connect} from "react-redux";
+import {scheduleChecklist} from "../website/WebsiteActions";
+import PropTypes from "prop-types";
 
 
 class ChecklistDetail extends Component {
@@ -16,6 +19,8 @@ class ChecklistDetail extends Component {
             website: null,
             isActive: false
         };
+
+
     }
 
     componentDidMount() {
@@ -31,6 +36,12 @@ class ChecklistDetail extends Component {
             toastOnError(error);
         });
     }
+
+    handleClick = (event) => {
+        const id = event.target.value
+        this.props.scheduleChecklist(id, {});
+        // setLoading(true);
+    };
 
     render() {
         if (!this.state.isActive) {
@@ -93,6 +104,16 @@ class ChecklistDetail extends Component {
                     <div className="col-md-10 mt-5">
                         <div>
                             <h2>Checklist</h2>
+
+                            <Button
+                                className="float-right button-checklist"
+                                variant="primary"
+                                disabled={this.state.website.checklist[0].status === '0'}
+                                onClick={this.handleClick}
+                                value={this.state.website.id}
+                            >
+                                Rerun the checklist
+                            </Button>
                             <Table striped bordered hover>
                                 <thead>
                                 <tr>
@@ -117,5 +138,15 @@ class ChecklistDetail extends Component {
 }
 
 
-export default withRouter(ChecklistDetail);
+ChecklistDetail.propTypes = {
+    website: PropTypes.any,
+};
+
+const mapStateToProps = state => ({
+    website: state.website,
+});
+
+export default connect(mapStateToProps, {
+    scheduleChecklist,
+})(withRouter(ChecklistDetail));
 

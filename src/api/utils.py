@@ -1,20 +1,24 @@
 import uuid
 from datetime import datetime
 
+from scrapy import crawler
 from scrapy.crawler import CrawlerProcess
-from src.api.models import Website, Page, Result, Block, Scan
+from scrapy.utils.log import configure_logging
+
+from twisted.internet import reactor
+from src.api.models import Website, Page, Result, Block, Scan, Checklist, Task
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs
-from src.api.spiders.check_for_minified_spider import CheckMinifySpider
 from src.api.spiders.check_google_analytics_spider import CheckGoogleAnalyticsSpider
 from src.api.spiders.check_metatag_spider import CheckMetaTagSpider
 from src.api.spiders.check_nice_urls_spider import CheckNiceUrlsSpider
 from src.api.spiders.check_robot_spider import CheckRobotSpider
-from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
 from src.api.spiders.get_sitemap_spider import SitemapSpider
+from multiprocessing import Queue
+from billiard.context import Process
 
 
 def get_sitemap(website: Website):
@@ -134,81 +138,75 @@ def schedule_website(websiteId: uuid.UUID):
     return schedule
 
 
-def check_for_sitemap(websiteId: uuid.UUID, process: CrawlerProcess):
-    """
-       This function will check for a sitemap for the assign components
-       :param process:
-       :param websiteId: Give the components you want to check for a sitemap
-       """
-    website = Website.objects.filter(id=websiteId).first()
-    spider = process
-    spider.crawl(CheckSitemapSpider, url=website.url)
-    # spider.start()
+def schedule_checklist(websiteId: uuid.UUID):
+    checklist = Checklist.objects.filter(website__id=websiteId).first()
+    tasks = Task.objects.filter(check_list_id=checklist.id)
+    for task in tasks:
+        print("{} task is deleted ".format(task.id))
+        task.delete()
 
-
-def check_for_robots(websiteId: uuid.UUID, process: CrawlerProcess):
-    """
-       This function will check for a sitemap for the assign components
-       :param process:
-       :param websiteId: Give the components you want to check for a sitemap
-       """
-    website = Website.objects.filter(id=websiteId).first()
-    spider = process
-    spider.crawl(CheckRobotSpider, url=website.url)
-
-
-def check_for_metatags(websiteId: uuid.UUID, process: CrawlerProcess):
-    """
-       This function will check for the metatags, description and page title for the assign components
-       :param process:
-       :param websiteId: Give the components you want to check for a sitemap
-       """
-
-    website = Website.objects.filter(id=websiteId).first()
-    pages = website.pages.filter(website=website).distinct('url')
-
-    if pages:
-        spider = process
-        spider.crawl(CheckMetaTagSpider, urls=pages)
-
-
-def check_for_google_analytics(websiteId: uuid.UUID, process: CrawlerProcess):
-    """
-       This function will check for the google analytics for the assign components
-       :param process:
-       :param websiteId: Give the components you want to check for a sitemap
-    """
-    website = Website.objects.filter(id=websiteId).first()
-    spider = process
-    spider.crawl(CheckGoogleAnalyticsSpider, url=website.url)
-
-
-def check_for_nice_urls(websiteId: uuid.UUID, process: CrawlerProcess):
-    """
-       This function will check for a Nice URL's for the assign components
-       :param process:
-       :param websiteId: Give the components you want to check for a sitemap
-    """
-    website = Website.objects.filter(id=websiteId).first()
-    pages = website.pages.filter(website=website).distinct('url')
-
-    if pages:
-        spider = process
-        spider.crawl(CheckNiceUrlsSpider, urls=pages)
-    else:
-        print('no pages available')
+    checklist.status = 0
+    checklist.save()
 
 
 def check_all(websiteId: uuid.UUID):
     # Call the Crawler process to start up the spiders
-    process = CrawlerProcess()
+    website = Website.objects.filter(id=websiteId).first()
+    pages = website.pages.filter(website=website).distinct('url')
+    checklist = Checklist.objects.filter(website_id=website.id).first()
 
+    configure_logging()
     # Set up the spiders
-    check_for_sitemap(websiteId=websiteId, process=process)
-    check_for_robots(websiteId=websiteId, process=process)
-    check_for_metatags(websiteId=websiteId, process=process)
-    check_for_google_analytics(websiteId=websiteId, process=process)
-    check_for_nice_urls(websiteId=websiteId, process=process)
 
-    # Activate the spiders
-    process.start()
+    print('------------------------')
+    print(checklist.status)
+    print(checklist.status == 3)
+    print(checklist.status == '3')
+    print('------------------------')
+
+    # ('NOT_STARTED', _('Not started')),
+    if checklist.status == '0':
+        run_spider(SitemapSpider, urls=[website.url])
+
+    # ('SITEMAP', _('Sitemap')),
+    if checklist.status == '1':
+        run_spider(CheckRobotSpider, urls=[website.url])
+
+    # ('ROBOTS', _('Robots')),
+    if checklist.status == '2':
+        run_spider(CheckMetaTagSpider, urls=pages)
+
+    # ('GOOGLE', _('Google Analytics')),
+    if checklist.status == '3':
+        run_spider(CheckGoogleAnalyticsSpider, urls=[website.url])
+
+    # ('METATAGS', _('Meta tags')),
+    if checklist.status == '4':
+        run_spider(CheckNiceUrlsSpider, urls=pages)
+
+    # ('COMPLETED', _('Completed')),
+
+
+def run_spider(spider, *args, **kwargs):
+    def f(q):
+        try:
+            runner = crawler.CrawlerProcess()
+
+            deferred = runner.crawl(spider, urls=kwargs.get('urls'))
+            deferred.addBoth(lambda _: reactor.stop())
+            print('why are you running ')
+            reactor.run()
+            q.put(None)
+            print('put none but run!!')
+        except Exception as e:
+            print("FOUTMELDING!!!!!: {}".format(e))
+            q.put(e)
+
+    q = Queue()
+    p = Process(target=f, args=(q,))
+    p.start()
+    result = q.get()
+    p.join()
+
+    if result is not None:
+        raise result
