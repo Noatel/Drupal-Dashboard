@@ -194,12 +194,9 @@ def run_spider(spider, *args, **kwargs):
 
             deferred = runner.crawl(spider, urls=kwargs.get('urls'))
             deferred.addBoth(lambda _: reactor.stop())
-            print('why are you running ')
             reactor.run()
             q.put(None)
-            print('put none but run!!')
         except Exception as e:
-            print("FOUTMELDING!!!!!: {}".format(e))
             q.put(e)
 
     q = Queue()
