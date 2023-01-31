@@ -29,10 +29,8 @@ class SitemapSpider(scrapy.Spider):
         self.start_url = sitemap_url
         self.urls = []
         self.website_id = website.id
-        print('init deze shit?!?!')
 
     def parse(self, response, **kwargs):
-        print('goed je bent erin !!!')
         links = response.text.split('\n')
 
         for link in links:
