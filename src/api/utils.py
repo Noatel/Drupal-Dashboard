@@ -13,6 +13,7 @@ from src.api.models import Website, Page, Result, Block, Scan, Checklist, Task
 from src.api.spiders.check_google_analytics_spider import CheckGoogleAnalyticsSpider
 from src.api.spiders.check_metatag_spider import CheckMetaTagSpider
 from src.api.spiders.check_nice_urls_spider import CheckNiceUrlsSpider
+from src.api.spiders.check_page_spider import CheckPageSpider
 from src.api.spiders.check_robot_spider import CheckRobotSpider
 from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
@@ -49,6 +50,21 @@ def scan_page(website: Website):
     if pages:
         spider = CrawlerProcess()
         spider.crawl(ContentSpider, urls=pages)
+        spider.start()
+
+
+def scan_page_test(website: Website):
+    """
+        This function will go to a specifc page and retreive drupal content blocks
+
+        :param website: Give the components you want to get the sitemap from
+    """
+
+    pages = website.pages.filter(website=website).distinct('url')
+
+    if pages:
+        spider = CrawlerProcess()
+        spider.crawl(CheckPageSpider, urls=pages)
         spider.start()
 
 

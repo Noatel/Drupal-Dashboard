@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from src.api.models import Website, Page, Block, Content, Result, Task, Checklist
+from src.api.models import Website, Page, Block, Content, Result, Task, Checklist, PageResult
 
 
 class ContentSerializer(serializers.ModelSerializer):
@@ -75,3 +75,17 @@ class WebsiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Website
         fields = ['id', 'name', 'description', 'url', 'image', 'pages', 'checklist']
+
+
+class PageResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PageResult
+        fields = ['id', 'attribute', 'value', 'className']
+
+
+class PageWithResultsSerializer(serializers.ModelSerializer):
+    page_results = PageResultsSerializer(many=True)
+
+    class Meta:
+        model = Page
+        fields = ['id', 'url', 'name', 'page_results']

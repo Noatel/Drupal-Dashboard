@@ -5,7 +5,7 @@ import {IconContext} from "react-icons";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {Breadcrumb, Spinner} from "react-bootstrap";
+import {Accordion, Breadcrumb, Card, Spinner} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
 class Page extends Component {
@@ -18,6 +18,7 @@ class Page extends Component {
                 name: "",
                 url: "",
             },
+            results: null,
             isActive: false,
         };
 
@@ -26,6 +27,7 @@ class Page extends Component {
         this.handleShow = this.handleShow.bind(this);
         this.handleShowHistory = this.handleShowHistory.bind(this);
         this.handleCloseHistory = this.handleCloseHistory.bind(this);
+        this.returnTable = this.returnTable.bind(this);
     }
 
     componentDidMount() {
@@ -34,6 +36,14 @@ class Page extends Component {
         axios.get(`/pages/?page_id=${id}&blocks=true`).then(response => {
             this.setState({
                 page: response.data[0],
+            })
+        }).catch(error => {
+            toastOnError(error);
+        });
+
+        axios.get(`/pages/${id}/results`).then(response => {
+            this.setState({
+                results: response.data[0],
                 isActive: true
             })
         }).catch(error => {
@@ -71,6 +81,14 @@ class Page extends Component {
             showHistory: 'close'
         });
         return false;
+    }
+
+    returnTable(result) {
+        return (<tr key={result.id}>
+            <td>{result.attribute}  </td>
+            <td><p>{result.value}</p></td>
+            <td>{result.className}</td>
+        </tr>);
     }
 
 
@@ -165,6 +183,38 @@ class Page extends Component {
                     </tr>);
             });
         }
+
+        let resultsHeaders = [];
+        let resultsIds = [];
+        let resultsAlts = [];
+
+        this.state.results.page_results.forEach(result => {
+            if (result.attribute === 'h1') {
+                resultsHeaders.push(result)
+            } else if (result.attribute === 'id') {
+                resultsIds.push(result)
+            } else if (result.attribute === 'alt') {
+                resultsAlts.push(result)
+            }
+        });
+        
+        const statusHeader = resultsHeaders.length > 0 ? 'red' : 'green'
+        const statusId = resultsIds.length > 0 ? 'red' : 'green'
+        const statusAlt = resultsAlts.length > 0 ? 'red' : 'green'
+
+
+        resultsHeaders = resultsHeaders.map(result => {
+            return (this.returnTable(result));
+        });
+
+        resultsIds = resultsIds.map(result => {
+            return (this.returnTable(result));
+        });
+
+        resultsAlts = resultsAlts.map(result => {
+            return (this.returnTable(result));
+        });
+
         return (
             <div className=" container">
                 <div className=" row">
@@ -184,12 +234,12 @@ class Page extends Component {
                         </p>
                         <div className=" form-group">
                             <label htmlFor=" name">Name:</label>
-                            <input type=" name" className=" form-control" readOnly={true} id=" name"
+                            <input type="name" className=" form-control" readOnly={true} id="name"
                                    value={this.state.page.name}/>
                         </div>
                         <div className=" form-group">
                             <label htmlFor=" url">Url:</label>
-                            <input type=" url" className=" form-control" readOnly={true} id=" url"
+                            <input type=" url" className=" form-control" readOnly={true} id="url"
                                    value={this.state.page.url}/>
                         </div>
                     </div>
@@ -199,9 +249,128 @@ class Page extends Component {
                     </div>
 
                     <div className=" col-md-10 mt-5">
+                        <h2 className=" d-inline-block">SEO to perfection:</h2>
+                        <p>
+                            For the website to reach a high SEO, it need to follow a couple rules
+                        </p>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1">
+                                    There can only be <u>1</u> H1 on a page
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusHeader, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsHeaders.length > 0 ?
+                                                    <div>
+                                                        <h4>There is no repeated ID's being used</h4>
+                                                        <Table className="tableBlock" striped bordered hover
+                                                               size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsHeaders}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> is only 1 H1 on the webpage! </p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1">
+                                    There is no repeated ID's being used
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusId, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsIds.length > 0 ?
+                                                    <div>
+                                                        <Table className="tableBlock" striped bordered hover size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsIds}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> There are no duplicate ID's on this page!</p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1">
+                                    Image need <u>alt</u> text
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusAlt, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsAlts.length > 0 ?
+                                                    <div>
+                                                        <Table className="tableBlock" striped bordered hover
+                                                               size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsAlts}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> All Alt text are filled in correctly! </p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                    </div>
+                </div>
+                <div className=" row">
+                    <div className=" col-md-2">
+                    </div>
+                    <div className=" col-md-10 mt-5">
                         <h2 className=" d-inline-block">Content blocks:</h2>
                         <p>The Drupal custom blocks that exsist on the page <br/>
-                            You can check out the content what is in the block or the tests results (If there is any)
+                            You can check out the content what is in the block or the tests results (If there is
+                            any)
                         </p>
                         <ol>
                             <li>Green: Nothing changed</li>

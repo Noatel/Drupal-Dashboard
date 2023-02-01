@@ -167,3 +167,15 @@ class Task(models.Model):
 
     created_at = models.DateTimeField(default=django.utils.timezone.now)
     completed_at = models.DateTimeField(blank=True, null=True)
+
+
+class PageResult(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, null=False, related_name='page_results', default=3)
+    value = JSONField()
+    attribute = models.CharField(max_length=255, null=True)
+    className = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return self.status
+

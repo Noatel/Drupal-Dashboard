@@ -55,6 +55,5 @@ def check_for_deleted_blocks():
 def check_for_checklist():
     """Check for tasks that haven't completed yet """
     checklists = Checklist.objects.filter(~Q(status=6))
-
     for checklist in checklists:
         check_all(websiteId=checklist.website_id)

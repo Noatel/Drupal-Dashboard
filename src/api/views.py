@@ -1,7 +1,9 @@
+from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from src.api.models import Website, Page, Block
-from src.api.serializers import WebsiteSerializer, PageSerializer, BlockSerializer
+from src.api.serializers import WebsiteSerializer, PageSerializer, BlockSerializer, \
+    PageWithResultsSerializer
 from rest_framework.response import Response
 from src.api.utils import schedule_website, schedule_checklist
 
@@ -38,7 +40,6 @@ class WebsiteViewSet(viewsets.ModelViewSet):
         """
 
         schedule = schedule_website(websiteId=pk)
-
         return Response(data='Scheduled', status=status.HTTP_201_CREATED, content_type="application/json")
 
 
@@ -48,6 +49,20 @@ class PageViewSet(viewsets.ModelViewSet):
     """
     queryset = Page.objects.all().order_by('name')
     serializer_class = PageSerializer
+
+    @action(methods=['get'], detail=True, url_name='results', url_path='results')
+    def results(self, request, pk):
+        """
+           Return a results of the test
+        """
+        print(pk)
+        if pk:
+            queryset = Page.objects.filter(id=pk)
+            serializer = PageWithResultsSerializer(queryset, many=True)
+
+            return Response(serializer.data)
+
+        return Response(data='No website_id provided', status=status.HTTP_201_CREATED, content_type="application/json")
 
     def get_queryset(self):
 
