@@ -6,7 +6,7 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.log import configure_logging
 
 from twisted.internet import reactor
-from src.api.models import Website, Page, Result, Block, Scan, Checklist, Task
+from src.api.models import Website, Result, Scan, Checklist, Task
 
 # Import the Content spider to get content from the components
 # And the sitemap for getting all the URLs

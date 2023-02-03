@@ -4,7 +4,8 @@ import Table from "react-bootstrap/Table";
 import {Breadcrumb, Button, Spinner} from "react-bootstrap";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {AiFillEye, AiOutlineLink} from "react-icons/all";
+import {AiFillEye, AiOutlineLink, AiOutlineWarning, BsCircleFill, MdOutlineDone} from "react-icons/all";
+import {IconContext} from "react-icons";
 
 class WebsiteDetail extends Component {
     constructor(props) {
@@ -50,6 +51,7 @@ class WebsiteDetail extends Component {
         });
     }
 
+
     render() {
 
         if (!this.state.isActive) {
@@ -91,15 +93,41 @@ class WebsiteDetail extends Component {
             );
         }
 
+
         let items = this.state.pages.map(page => {
+            let pageErrors = 0;
+
+            if (Object.keys(page.page_results).length > 0) {
+                page.page_results.forEach(result => {
+                    if (result.attribute === 'meta') {
+                        if (result.value[0].length === 0 || result.value[1].length === 0 || (result.value[0].length === 0 && result.value[1].length === 0)) {
+                            pageErrors += 1;
+                        }
+                    } else {
+                        pageErrors += 1;
+                    }
+                });
+            }
             return (
                 <tr key={page.id}>
                     <td><p
                         style={{textTransform: 'capitalize'}}>{page.name ? page.name.split('-').join(' ') : "None"}  </p>
                     </td>
-                    <td><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
-                    {/*<td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>*/}
-                    <td>
+                    {pageErrors > 0 ?
+                        <td className="align-middle text-center"><IconContext.Provider value={{color: 'red', textAlign: "center"}}>
+                            <AiOutlineWarning/>
+                        </IconContext.Provider>
+                            {pageErrors}
+                        </td>
+                        : <td className="align-middle text-center">
+                            <IconContext.Provider value={{color: 'green', textAlign: "center"}}>
+                                <MdOutlineDone/>
+                            </IconContext.Provider>
+                            0</td>}
+
+
+                    <td className="align-middle text-center"><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
+                    <td className="align-middle text-center">
                         <Link to={"/page/" + page.id} key={page.id} page={page}>
                             <AiFillEye/>
                         </Link>
@@ -150,8 +178,8 @@ class WebsiteDetail extends Component {
                                             <thead>
                                             <tr>
                                                 <th>Name</th>
+                                                <th>Problems</th>
                                                 <th>URL</th>
-                                                {/*<th>Edit</th>*/}
                                                 <th>View</th>
                                             </tr>
                                             </thead>

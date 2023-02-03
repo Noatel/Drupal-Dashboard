@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -55,7 +56,6 @@ class PageViewSet(viewsets.ModelViewSet):
         """
            Return a results of the test
         """
-        print(pk)
         if pk:
             queryset = Page.objects.filter(id=pk)
             serializer = PageWithResultsSerializer(queryset, many=True)

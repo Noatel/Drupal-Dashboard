@@ -75,31 +75,33 @@ class CheckMetaTagSpider(scrapy.Spider):
 
         try:
             # If there are any characters in the meta descriptions, it means it exist.
-            # And if its the last page
-            if len(meta_description) > 0 and title != "" and self.url_position == (len(self.urls) - 1):
-                # Based on the origin url get the checklist
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[3],
-                    status=Task.STATUS[1],
-                    completed_at=datetime.now(),
-                    check_list=checklist,
-                    comment='Metatag description and titles found on all pages'
-                )
-
-                self.status = 3
-                checklist.status = 3
-                checklist.save()
-            # IF the meta description OR the title is empty
-            elif check_title and self.url_position == (len(self.urls) - 1) or check_description and self.url_position == (len(self.urls) - 1):
-                comment = "['description not found']" if self.check_description else "['title tag not found']"
-                comment += self.titles
-                comment += self.descriptions
+            # And if it's the last page
+            if len(meta_description) == 0 and title != "":
                 task = Task.objects.get_or_create(
                     type=Task.TYPE[3],
                     status=Task.STATUS[2],
                     check_list=checklist,
-                    comment=comment
+                    comment='Meta description not found on page {}'.format(self.urls[self.url_position].url)
                 )
+            elif len(meta_description) > 0 and title == "":
+                task = Task.objects.get_or_create(
+                    type=Task.TYPE[3],
+                    status=Task.STATUS[2],
+                    check_list=checklist,
+                    comment='Page title not found on page {}'.format(self.urls[self.url_position].url)
+                )
+            elif len(meta_description) == 0 and title == "":
+                task = Task.objects.get_or_create(
+                    type=Task.TYPE[3],
+                    status=Task.STATUS[2],
+                    check_list=checklist,
+                    comment='Meta description and page title not found not found'
+                )
+
+            self.status = 3
+            checklist.status = 3
+            checklist.save()
+
         except Exception as e:
             task = Task.objects.get_or_create(
                 type=Task.TYPE[3],

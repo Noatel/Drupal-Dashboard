@@ -48,10 +48,26 @@ class PageSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'url', 'blocks']
 
 
+class PageResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PageResult
+        fields = ['id', 'attribute', 'value', 'className']
+
+
+
+
+class ResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PageResult
+        fields = ['attribute', 'value']
+
+
 class WebPageSerializer(serializers.ModelSerializer):
+    page_results = ResultsSerializer(many=True)
+
     class Meta:
         model = Page
-        fields = ['id', 'name', 'url']
+        fields = ['id', 'name', 'url', 'page_results']
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -77,15 +93,11 @@ class WebsiteSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'url', 'image', 'pages', 'checklist']
 
 
-class PageResultsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PageResult
-        fields = ['id', 'attribute', 'value', 'className']
-
-
 class PageWithResultsSerializer(serializers.ModelSerializer):
     page_results = PageResultsSerializer(many=True)
 
     class Meta:
         model = Page
         fields = ['id', 'url', 'name', 'page_results']
+
+

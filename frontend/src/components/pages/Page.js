@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import Table from "react-bootstrap/Table";
-import {AiFillExperiment, AiFillEye, BsCircleFill} from "react-icons/all";
+import {AiFillExperiment, AiFillEye, BsChevronDown, BsChevronUp, BsCircleFill, FaChevronUp} from "react-icons/all";
 import {IconContext} from "react-icons";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
@@ -20,6 +20,11 @@ class Page extends Component {
             },
             results: null,
             isActive: false,
+
+            openHeader: false,
+            openId: false,
+            openAlt: false,
+            openOrder: false,
         };
 
         this.handlePageDetail = this.handlePageDetail.bind(this);
@@ -28,6 +33,11 @@ class Page extends Component {
         this.handleShowHistory = this.handleShowHistory.bind(this);
         this.handleCloseHistory = this.handleCloseHistory.bind(this);
         this.returnTable = this.returnTable.bind(this);
+
+        this.openHeader = this.openHeader.bind(this);
+        this.openAlt = this.openAlt.bind(this);
+        this.openId = this.openId.bind(this);
+        this.openOrder = this.openOrder.bind(this);
     }
 
     componentDidMount() {
@@ -81,6 +91,34 @@ class Page extends Component {
             showHistory: 'close'
         });
         return false;
+    }
+
+    openHeader(state) {
+        this.setState({
+            openHeader: state
+        })
+        return state
+    }
+
+    openAlt(state) {
+        this.setState({
+            openAlt: state
+        })
+        return state
+    }
+
+    openId(state) {
+        this.setState({
+            openId: state
+        })
+        return state
+    }
+
+    openOrder(state) {
+        this.setState({
+            openOrder: state
+        })
+        return state
     }
 
     returnTable(result) {
@@ -187,6 +225,10 @@ class Page extends Component {
         let resultsHeaders = [];
         let resultsIds = [];
         let resultsAlts = [];
+        let resultsOrders = [];
+
+        let metaTitle = "";
+        let metaDescription = "";
 
         this.state.results.page_results.forEach(result => {
             if (result.attribute === 'h1') {
@@ -195,12 +237,20 @@ class Page extends Component {
                 resultsIds.push(result)
             } else if (result.attribute === 'alt') {
                 resultsAlts.push(result)
+            } else if (result.attribute === 'order') {
+                resultsOrders.push(result)
+            } else if (result.attribute === 'meta') {
+                metaTitle = result.value[0];
+                metaDescription = result.value[1];
             }
         });
-        
+
         const statusHeader = resultsHeaders.length > 0 ? 'red' : 'green'
         const statusId = resultsIds.length > 0 ? 'red' : 'green'
         const statusAlt = resultsAlts.length > 0 ? 'red' : 'green'
+        const statusOrders = resultsOrders.length > 0 ? 'red' : 'green'
+        const descriptionColor = metaDescription.length > 0 ? 'green' : 'red'
+        const titleColor = metaTitle.length > 0 ? 'green' : 'red'
 
 
         resultsHeaders = resultsHeaders.map(result => {
@@ -212,6 +262,10 @@ class Page extends Component {
         });
 
         resultsAlts = resultsAlts.map(result => {
+            return (this.returnTable(result));
+        });
+
+        resultsOrders = resultsOrders.map(result => {
             return (this.returnTable(result));
         });
 
@@ -249,19 +303,51 @@ class Page extends Component {
                     </div>
 
                     <div className=" col-md-10 mt-5">
+                        <div className=" form-group">
+                            <label htmlFor="meta_title">
+                                <div className="statusIcon">
+                                    <IconContext.Provider value={{color: titleColor, textAlign: "center"}}>
+                                        <BsCircleFill/>
+                                    </IconContext.Provider>
+                                </div>
+                                Meta title:</label>
+                            <input type="meta_title" className=" form-control" readOnly={true} id="url"
+                                   defaultValue={metaTitle}/>
+                        </div>
+                        <label htmlFor="meta_description">
+                            <div className="statusIcon">
+                                <IconContext.Provider value={{color: descriptionColor, textAlign: "center"}}>
+                                    <BsCircleFill/>
+                                </IconContext.Provider>
+                            </div>
+                            Meta description:</label>
+                        <textarea className="form-control" name="meta_description" id="" cols="30" rows="10" disabled
+                                  value={metaDescription}/>
+                    </div>
+                </div>
+
+
+                <div className=" row">
+                    <div className=" col-md-2">
+                    </div>
+
+                    <div className=" col-md-10 mt-5">
                         <h2 className=" d-inline-block">SEO to perfection:</h2>
                         <p>
                             For the website to reach a high SEO, it need to follow a couple rules
                         </p>
                         <Accordion defaultActiveKey="0">
                             <Card>
-                                <Accordion.Toggle as={Card.Header} eventKey="1">
-                                    There can only be <u>1</u> H1 on a page
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openHeader(!this.state.openHeader)}>
                                     <div className="statusIcon">
                                         <IconContext.Provider value={{color: statusHeader, textAlign: "center"}}>
                                             <BsCircleFill/>
                                         </IconContext.Provider>
                                     </div>
+                                    There can only be <u>1</u> H1 on a page
+                                    {this.state.openHeader ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
                                 </Accordion.Toggle>
                                 <Accordion.Collapse eventKey="1">
                                     <Card.Body>
@@ -292,13 +378,16 @@ class Page extends Component {
                         </Accordion>
                         <Accordion defaultActiveKey="0">
                             <Card>
-                                <Accordion.Toggle as={Card.Header} eventKey="1">
-                                    There is no repeated ID's being used
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openId(!this.state.openId)}>
                                     <div className="statusIcon">
                                         <IconContext.Provider value={{color: statusId, textAlign: "center"}}>
                                             <BsCircleFill/>
                                         </IconContext.Provider>
                                     </div>
+                                    There is no repeated ID's being used
+                                    {this.state.openId ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
                                 </Accordion.Toggle>
                                 <Accordion.Collapse eventKey="1">
                                     <Card.Body>
@@ -327,13 +416,17 @@ class Page extends Component {
                         </Accordion>
                         <Accordion defaultActiveKey="0">
                             <Card>
-                                <Accordion.Toggle as={Card.Header} eventKey="1">
-                                    Image need <u>alt</u> text
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openAlt(!this.state.openAlt)}>
+
                                     <div className="statusIcon">
                                         <IconContext.Provider value={{color: statusAlt, textAlign: "center"}}>
                                             <BsCircleFill/>
                                         </IconContext.Provider>
                                     </div>
+                                    Image need <u>alt</u> text
+                                    {this.state.openAlt ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
                                 </Accordion.Toggle>
                                 <Accordion.Collapse eventKey="1">
                                     <Card.Body>
@@ -355,6 +448,45 @@ class Page extends Component {
                                                             </tbody>
                                                         </Table>
                                                     </div> : <p> All Alt text are filled in correctly! </p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openOrder(!this.state.openOrder)}>
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusOrders, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                    Headers need to be alphanumerics (h1, h2, h3, h4, h5, h6)
+                                    {this.state.openOrder ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsOrders.length > 0 ?
+                                                    <div>
+                                                        <Table className="tableBlock" striped bordered hover
+                                                               size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsOrders}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> The order of the headers is done correctly! </p>}
                                             </div>
                                         </div>
                                     </Card.Body>
@@ -399,7 +531,8 @@ class Page extends Component {
                     <hr/>
                 </div>
             </div>
-        );
+        )
+            ;
     }
 }
 

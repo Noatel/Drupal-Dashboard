@@ -1,4 +1,5 @@
 import logging
+import sys
 import uuid
 
 import scrapy
@@ -28,12 +29,15 @@ class CheckPageSpider(scrapy.Spider):
 
         # From the response that I get,
         # We are going to check first if there are multiple headers
+        page = self.urls[self.url_position]
+        page_results = PageResult.objects.filter(page=page)
+        page_results.delete()
 
-        # TODO: Uncomment
-        # check_headers = self.check_headers(response=response)
-        # check_ids = self.check_ids(response=response)
+        check_headers = self.check_headers(response=response)
+        check_ids = self.check_ids(response=response)
         check_images = self.check_images(response=response)
-
+        check_order = self.check_order(response=response)
+        check_meta = self.check_meta(response=response)
 
         # Now for the next page on the components,
         # check if the position is equal to the amount of pages, and check if it's not empty
@@ -73,7 +77,7 @@ class CheckPageSpider(scrapy.Spider):
                 # Since we need to assign a group id to all the test result
                 group_id = uuid.uuid4()
 
-                result_attributes, created = PageResult.objects.get_or_create(
+                result_attributes, created = PageResult.objects.update_or_create(
                     page=page,
                     value=''.join(header.xpath('text()').extract()),
                     attribute='h1',
@@ -101,7 +105,7 @@ class CheckPageSpider(scrapy.Spider):
                     array_ids.append(name)
                 else:
                     className = id.css('::attr(class)').extract_first()
-                    result_attributes, created = PageResult.objects.get_or_create(
+                    result_attributes, created = PageResult.objects.update_or_create(
                         page=page,
                         value=name,
                         attribute='id',
@@ -126,9 +130,64 @@ class CheckPageSpider(scrapy.Spider):
             for image in images:
                 className = image.css('::attr(class)').extract_first()
                 source = image.css('::attr(src)').extract_first()
-                result_attributes, created = PageResult.objects.get_or_create(
-                        page=page,
-                        value=source,
-                        attribute='alt',
-                        className=className,
-                    )
+                result_attributes, created = PageResult.objects.update_or_create(
+                    page=page,
+                    value=source,
+                    attribute='alt',
+                    className=className,
+                )
+
+    def check_order(self, response):
+        """
+                This function will check if there are multiple id's on the page
+
+                :param self: The URL's from the pages
+                :param response: The response the scraper gets from the webpage
+        """
+        headers = {
+            'h1': False,
+            'h2': False,
+            'h3': False,
+            'h4': False,
+            'h5': False,
+            'h6': False,
+        }
+
+        # Building the array
+        for x in range(1, 7):
+            text = response.xpath('//h{}'.format(x))
+            if text:
+                headers['h{}'.format(x)] = response.xpath('//h{}'.format(x))
+
+        for x in range(1, 7):
+            # If the array is empty
+            if headers['h{}'.format(x)] is False:
+                # check if previous is filled and one after that
+                for i in range(0, len(headers) - x):
+                    # The current header + the new header + 1
+                    next_header = x + i + 1
+                    if headers['h{}'.format(next_header)] is not False:
+                        page = self.urls[self.url_position]
+                        result_attributes, created = PageResult.objects.update_or_create(
+                            page=page,
+                            value='h{} is empty but h{} is filled'.format(x, next_header),
+                            attribute='order',
+                            className="",
+                        )
+
+    def check_meta(self, response):
+        title = response.xpath("//title/text()").extract()
+        check_title = title == ""
+
+        meta_description = response.xpath("//meta[@name='description']/@content").extract()
+        title = response.xpath("//title/text()").extract()
+
+        page = self.urls[self.url_position]
+
+        # Just save always the metadata for the customer to see
+        result_attributes, created = PageResult.objects.update_or_create(
+            page=page,
+            value=[title, meta_description],
+            attribute='meta',
+            className="",
+        )

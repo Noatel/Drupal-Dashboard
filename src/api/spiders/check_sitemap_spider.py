@@ -78,8 +78,6 @@ class CheckSitemapSpider(scrapy.Spider):
                     comment="Sitemap.xml not found"
                 )
 
-            return task
-
         except Exception as e:
             task = Task.objects.get_or_create(
                 type=Task.TYPE[1],
