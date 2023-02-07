@@ -24,8 +24,9 @@ class CheckSitemapSpider(scrapy.Spider):
     name = 'Sitemap spider'
 
     def __init__(self, *args, **kwargs):
+
         # Disable the logging (Not needed)
-        logging.getLogger('scrapy').propagate = False
+        # logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
         urls = kwargs.get('urls')
@@ -36,12 +37,17 @@ class CheckSitemapSpider(scrapy.Spider):
         sitemap_url = format_url(url, '/sitemap.xml')
 
         # Set it to a self so I can access it later
+        print('start url {}'.format(sitemap_url))
         self.start_urls = [sitemap_url]
         self.start_url = sitemap_url
         self.urls = []
         self.website_id = website.id
         self.website_url = website.url
         self.status = 1
+
+        self.handle_httpstatus_all = True
+        self.handle_httpstatus_list = [404]
+        self.HTTPERROR_ALLOWED_CODES = [404]
 
     def parse(self, response, **kwargs):
         """
@@ -56,32 +62,33 @@ class CheckSitemapSpider(scrapy.Spider):
         """
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
 
-        try:
-            if response.text[:5] == '<?xml' and ' '.join(response.text[-10:].split()) == '</urlset>':
-                # Based on the origin url get the checklist
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[1],
-                    status=Task.STATUS[1],
-                    completed_at=datetime.now(),
-                    check_list=checklist,
-                    comment='Sitemap.xml found'
-                )
+        if response.status != 404:
+            try:
+                if response.text[:5] == '<?xml' and ' '.join(response.text[-10:].split()) == '</urlset>':
+                    # Based on the origin url get the checklist
+                    task = Task.objects.get_or_create(
+                        type=Task.TYPE[1],
+                        status=Task.STATUS[1],
+                        completed_at=datetime.now(),
+                        check_list=checklist,
+                        comment='Sitemap.xml found'
+                    )
 
-                self.status = 2
-                checklist.status = 2
-                checklist.save()
-            else:
+                    self.status = 1
+                    checklist.status = 1
+                    checklist.save()
+
+            except Exception as e:
                 task = Task.objects.get_or_create(
                     type=Task.TYPE[1],
                     status=Task.STATUS[2],
                     check_list=checklist,
-                    comment="Sitemap.xml not found"
+                    comment=str(e)
                 )
-
-        except Exception as e:
+        else:
             task = Task.objects.get_or_create(
                 type=Task.TYPE[1],
                 status=Task.STATUS[2],
                 check_list=checklist,
-                comment=str(e)
+                comment="Sitemap.xml not found"
             )

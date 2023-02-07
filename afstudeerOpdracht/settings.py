@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-zmz_+njux90svs3#0ed9gjxl1&p8iw2@p$qh5=ig^c$x$5d%5)
 DEBUG = True
 
 ALLOWED_HOSTS = [
- "*"
+    "*"
 ]
 
 MEDIA_URL = '/media/'
@@ -168,7 +168,6 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:3000"
 ]
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
@@ -219,3 +218,7 @@ TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_VERBOSE = 2
 TEST_OUTPUT_DESCRIPTIONS = True
 TEST_OUTPUT_FILE_NAME = 'junit.xml'
+
+handle_httpstatus_all = True
+handle_httpstatus_list = [404]
+HTTPERROR_ALLOWED_CODES = [404]
