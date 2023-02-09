@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from src.api.models import Website, Page, Block, Content, Result, Task, Checklist, PageResult
+from src.api.models import Website, Page, Block, Content, Result, Task, Checklist, PageResult, PageValue
 
 
 class ContentSerializer(serializers.ModelSerializer):
@@ -48,26 +48,32 @@ class PageSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'url', 'blocks']
 
 
+class PageResultsValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PageValue
+        fields = ['value']
+
+
 class PageResultsSerializer(serializers.ModelSerializer):
+    page_value = PageResultsValueSerializer()
+
     class Meta:
         model = PageResult
-        fields = ['id', 'attribute', 'value', 'className']
-
-
+        fields = ['id', 'attribute', 'className','page_value']
 
 
 class ResultsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PageResult
-        fields = ['attribute', 'value']
+        fields = ['attribute']
 
 
 class WebPageSerializer(serializers.ModelSerializer):
-    page_results = ResultsSerializer(many=True)
+    # page_results = ResultsSerializer(many=True)
 
     class Meta:
         model = Page
-        fields = ['id', 'name', 'url', 'page_results']
+        fields = ['id', 'name', 'url']
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -85,6 +91,19 @@ class ChecklistSerializer(serializers.ModelSerializer):
 
 
 class WebsiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Website
+        fields = ['id', 'name', 'description', 'url', 'image',]
+
+
+class WebsiteWithChecklistSerializer(serializers.ModelSerializer):
+    checklist = ChecklistSerializer(many=True)
+
+    class Meta:
+        model = Website
+        fields = ['id', 'name','checklist']
+
+class WebsiteWithPagesSerializer(serializers.ModelSerializer):
     pages = WebPageSerializer(many=True)
     checklist = ChecklistSerializer(many=True)
 
@@ -94,10 +113,14 @@ class WebsiteSerializer(serializers.ModelSerializer):
 
 
 class PageWithResultsSerializer(serializers.ModelSerializer):
-    page_results = PageResultsSerializer(many=True)
+    # page_results = PageResultsSerializer(many=True)
+    page_results = serializers.SerializerMethodField()
 
     class Meta:
         model = Page
         fields = ['id', 'url', 'name', 'page_results']
 
+    def get_page_results(self, obj):
+        count = obj.page_results.count()
+        return count
 

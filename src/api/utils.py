@@ -148,9 +148,15 @@ def check_for_deleted_blocks(website: Website):
 
 def schedule_website(websiteId: uuid.UUID):
     website = Website.objects.filter(id=websiteId).first()
+
+    # Get the sitemap
     schedule, created = Scan.objects.get_or_create(
         website=website
     )
+
+    #schedule it
+    schedule.status=Scan.STATUS.SITEMAP
+    schedule.save()
 
     return schedule
 

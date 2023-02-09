@@ -160,12 +160,25 @@ EXTENSIONS = {
     'afstudeerOpdracht.extension.CustomLogExtension': 1,
 }
 
-CORS_ALLOW_ALL_ORIGINS = True  # Add this line too
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
     "http://localhost:3000",
     "http://127.0.0.1:3000"
+]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Add this line too
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 REST_FRAMEWORK = {
@@ -174,7 +187,9 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 25
 }
 
 ROOT_URLCONF = 'afstudeerOpdracht.urls'

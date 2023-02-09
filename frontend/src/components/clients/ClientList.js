@@ -18,7 +18,7 @@ class ClientsList extends Component {
     componentDidMount() {
         axios.get("/websites/").then(response => {
             this.setState({
-                websites: response.data,
+                websites: response.data.results,
                 isActive: true
             })
         }).catch(error => {

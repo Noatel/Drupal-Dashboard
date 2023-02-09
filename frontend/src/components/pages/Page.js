@@ -43,7 +43,7 @@ class Page extends Component {
     componentDidMount() {
         const {id} = this.props.match.params;
 
-        axios.get(`/pages/?page_id=${id}&blocks=true`).then(response => {
+        axios.get(`/pages/${id}/blocks`).then(response => {
             this.setState({
                 page: response.data[0],
             })
@@ -51,11 +51,13 @@ class Page extends Component {
             toastOnError(error);
         });
 
-        axios.get(`/pages/${id}/results`).then(response => {
+        axios.get(`/results/?page_id=${id}`).then(response => {
+
             this.setState({
-                results: response.data[0],
+                results: response.data.results,
                 isActive: true
             })
+
         }).catch(error => {
             toastOnError(error);
         });
@@ -124,7 +126,7 @@ class Page extends Component {
     returnTable(result) {
         return (<tr key={result.id}>
             <td>{result.attribute}  </td>
-            <td><p>{result.value}</p></td>
+            <td><p>{result.page_value.value}</p></td>
             <td>{result.className}</td>
         </tr>);
     }
@@ -230,45 +232,53 @@ class Page extends Component {
         let metaTitle = "";
         let metaDescription = "";
 
-        this.state.results.page_results.forEach(result => {
-            if (result.attribute === 'h1') {
-                resultsHeaders.push(result)
-            } else if (result.attribute === 'id') {
-                resultsIds.push(result)
-            } else if (result.attribute === 'alt') {
-                resultsAlts.push(result)
-            } else if (result.attribute === 'order') {
-                resultsOrders.push(result)
-            } else if (result.attribute === 'meta') {
-                metaTitle = result.value[0];
-                metaDescription = result.value[1];
-            }
-        });
+        let statusHeader = 'grey'
+        let statusId = 'grey'
+        let statusAlt = 'grey'
+        let statusOrders = 'grey'
+        let descriptionColor = 'grey'
+        let titleColor = 'grey'
 
-        const statusHeader = resultsHeaders.length > 0 ? 'red' : 'green'
-        const statusId = resultsIds.length > 0 ? 'red' : 'green'
-        const statusAlt = resultsAlts.length > 0 ? 'red' : 'green'
-        const statusOrders = resultsOrders.length > 0 ? 'red' : 'green'
-        const descriptionColor = metaDescription.length > 0 ? 'green' : 'red'
-        const titleColor = metaTitle.length > 0 ? 'green' : 'red'
+        if (this.state.results.length > 0) {
+            this.state.results.forEach(result => {
+                if (result.attribute === 'h1') {
+                    resultsHeaders.push(result)
+                } else if (result.attribute === 'id') {
+                    resultsIds.push(result)
+                } else if (result.attribute === 'alt') {
+                    resultsAlts.push(result)
+                } else if (result.attribute === 'order') {
+                    resultsOrders.push(result)
+                } else if (result.attribute === 'meta') {
+                    metaTitle = result.page_value.value[0];
+                    metaDescription = result.page_value.value[1];
+                }
+            });
+
+            statusHeader = resultsHeaders.length > 0 ? 'red' : 'green'
+            statusId = resultsIds.length > 0 ? 'red' : 'green'
+            statusAlt = resultsAlts.length > 0 ? 'red' : 'green'
+            statusOrders = resultsOrders.length > 0 ? 'red' : 'green'
+            descriptionColor = metaDescription.length > 0 ? 'green' : 'red'
+            titleColor = metaTitle.length > 0 ? 'green' : 'red'
 
 
-        resultsHeaders = resultsHeaders.map(result => {
-            return (this.returnTable(result));
-        });
+            resultsHeaders = resultsHeaders.map(result => {
+                return (this.returnTable(result));
+            });
 
-        resultsIds = resultsIds.map(result => {
-            return (this.returnTable(result));
-        });
+            resultsIds = resultsIds.map(result => {
+                return (this.returnTable(result));
+            });
 
-        resultsAlts = resultsAlts.map(result => {
-            return (this.returnTable(result));
-        });
+            resultsAlts = resultsAlts.map(result => {
+                return (this.returnTable(result));
+            });
 
-        resultsOrders = resultsOrders.map(result => {
-            return (this.returnTable(result));
-        });
-
+            resultsOrders = resultsOrders.map(result => {
+                return (this.returnTable(result));
+            });
+        }
         return (
             <div className=" container">
                 <div className=" row">

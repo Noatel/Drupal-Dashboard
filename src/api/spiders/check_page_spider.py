@@ -3,7 +3,7 @@ import sys
 import uuid
 
 import scrapy
-from src.api.models import Block, Content, PageResult
+from src.api.models import Block, Content, PageResult, PageValue
 from bs4 import BeautifulSoup
 
 
@@ -74,14 +74,15 @@ class CheckPageSpider(scrapy.Spider):
             page = self.urls[self.url_position]
 
             for header in headers:
-                # Since we need to assign a group id to all the test result
-                group_id = uuid.uuid4()
+                page_value, created = PageValue.objects.update_or_create(
+                    value=''.join(header.xpath('text()').extract()),
+                )
 
                 result_attributes, created = PageResult.objects.update_or_create(
                     page=page,
-                    value=''.join(header.xpath('text()').extract()),
                     attribute='h1',
                     className=''.join(header.xpath('@class').extract()),
+                    page_value=page_value
                 )
 
     def check_ids(self, response):
@@ -105,9 +106,13 @@ class CheckPageSpider(scrapy.Spider):
                     array_ids.append(name)
                 else:
                     className = id.css('::attr(class)').extract_first()
+                    page_value, created = PageValue.objects.update_or_create(
+                        value=name
+                    )
+
                     result_attributes, created = PageResult.objects.update_or_create(
                         page=page,
-                        value=name,
+                        page_value=page_value,
                         attribute='id',
                         className=className,
                     )
@@ -130,9 +135,14 @@ class CheckPageSpider(scrapy.Spider):
             for image in images:
                 className = image.css('::attr(class)').extract_first()
                 source = image.css('::attr(src)').extract_first()
+
+                page_value, created = PageValue.objects.update_or_create(
+                    value=source
+                )
+
                 result_attributes, created = PageResult.objects.update_or_create(
                     page=page,
-                    value=source,
+                    page_value=page_value,
                     attribute='alt',
                     className=className,
                 )
@@ -168,9 +178,14 @@ class CheckPageSpider(scrapy.Spider):
                     next_header = x + i + 1
                     if headers['h{}'.format(next_header)] is not False:
                         page = self.urls[self.url_position]
+
+                        page_value, created = PageValue.objects.update_or_create(
+                            value='h{} is empty but h{} is filled'.format(x, next_header),
+                        )
+
                         result_attributes, created = PageResult.objects.update_or_create(
                             page=page,
-                            value='h{} is empty but h{} is filled'.format(x, next_header),
+                            page_value=page_value,
                             attribute='order',
                             className="",
                         )
@@ -185,9 +200,14 @@ class CheckPageSpider(scrapy.Spider):
         page = self.urls[self.url_position]
 
         # Just save always the metadata for the customer to see
+
+        page_value, created = PageValue.objects.update_or_create(
+            value=[title, meta_description],
+        )
+
         result_attributes, created = PageResult.objects.update_or_create(
             page=page,
-            value=[title, meta_description],
+            page_value=page_value,
             attribute='meta',
             className="",
         )
