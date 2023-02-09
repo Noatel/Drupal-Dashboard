@@ -115,13 +115,12 @@ class Result(models.Model):
 
 
 class Scan(models.Model):
-    STATUS = ((
-        ('SITEMAP', _('Sitemap')),
-        ('GET_DATA', _('Get the data')),
-        ('COMPARE_BLOCKS', _('Compare the blocks')),
-        ('CHECK_DELETED', _('Check for deleted blocks')),
-        ('COMPLETED', _('Completed')),
-    ))
+    STATUS = Choices(
+        (1, 'SITEMAP', _('Sitemap')),
+        (2, 'GET_DATA', _('Get the data')),
+        (3, 'COMPARE_BLOCKS', _('Compare the blocks and check for deleted blocks')),
+        (4, 'COMPLETED', _('Completed')),
+    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=50, null=False, choices=STATUS)
@@ -190,7 +189,8 @@ class PageValue(models.Model):
 class PageResult(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, null=False, related_name='page_results', default=3)
-    page_value = models.ForeignKey(PageValue, on_delete=models.CASCADE, null=False, related_name='page_result', default=3)
+    page_value = models.ForeignKey(PageValue, on_delete=models.CASCADE, null=False, related_name='page_result',
+                                   default=3)
 
     attribute = models.CharField(max_length=255, null=True)
     className = models.CharField(max_length=255, null=True)

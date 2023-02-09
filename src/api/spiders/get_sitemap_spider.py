@@ -3,7 +3,7 @@ import logging
 import scrapy
 from scrapy import Selector
 
-from src.api.models import Page, Website
+from src.api.models import Page, Website, Scan
 
 
 class SitemapSpider(scrapy.Spider):
@@ -33,6 +33,7 @@ class SitemapSpider(scrapy.Spider):
         # response.selector.register_namespace('d', 'http://www.sitemaps.org/schemas/sitemap/0.9')
         # b = response.xpath('//d:loc')
         links = response.xpath("//*[local-name()='loc']")
+        print('starting sitempa spider')
         for link in links:
             # Searching for <loc> and </loc> element
             # When found, strip and get the link
@@ -45,3 +46,9 @@ class SitemapSpider(scrapy.Spider):
                     name=url.rsplit('/', 1)[-1],
                     website_id=self.website_id
                 )
+
+        print('perparing ending sitempa spider')
+        # Get scan and set the scan to the next step
+        scan = Scan.objects.filter(website_id=self.website_id).first()
+        scan.status = Scan.STATUS.GET_DATA
+        scan.save()

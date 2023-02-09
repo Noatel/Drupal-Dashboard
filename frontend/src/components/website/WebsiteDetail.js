@@ -7,6 +7,7 @@ import {toastOnError} from "../../utils/Utils";
 import {AiFillEye, AiOutlineLink, AiOutlineWarning, BsCircleFill, MdOutlineDone} from "react-icons/all";
 import {IconContext} from "react-icons";
 import {ADD_website} from "./WebsiteTypes";
+import {toast} from "react-toastify";
 
 class WebsiteDetail extends Component {
     constructor(props) {
@@ -57,7 +58,9 @@ class WebsiteDetail extends Component {
         axios
             .post(`/websites/${id}/schedule/`)
             .then(response => {
-                toastOnSucces()
+                toast.success('Added test to schedule!', {
+                    position: toast.POSITION.TOP_RIGHT
+                });
             })
             .catch(error => {
                 toastOnError(error);
