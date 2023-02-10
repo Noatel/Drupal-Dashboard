@@ -4,9 +4,8 @@ import Table from "react-bootstrap/Table";
 import {Breadcrumb, Button, Spinner, Pagination} from "react-bootstrap";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {AiFillEye, AiOutlineLink, AiOutlineWarning, BsCircleFill, MdOutlineDone} from "react-icons/all";
+import {AiFillEye, AiOutlineLink, AiOutlineWarning, MdOutlineDone} from "react-icons/all";
 import {IconContext} from "react-icons";
-import {ADD_website} from "./WebsiteTypes";
 import {toast} from "react-toastify";
 
 class WebsiteDetail extends Component {

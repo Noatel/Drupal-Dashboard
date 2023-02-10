@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import Table from "react-bootstrap/Table";
-import {AiFillExperiment, AiFillEye, BsChevronDown, BsChevronUp, BsCircleFill, FaChevronUp} from "react-icons/all";
+import {AiFillExperiment, AiFillEye, BsChevronDown, BsChevronUp, BsCircleFill} from "react-icons/all";
 import {IconContext} from "react-icons";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
@@ -204,8 +204,6 @@ class Page extends Component {
                                             </textarea>
                                     </div>
                                 </div>
-
-
                             </Modal.Body>
                         </Modal>
                         <td>
