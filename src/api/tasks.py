@@ -7,7 +7,6 @@ from src.api.models import Website, Scan, Checklist
 from src.api.utils import schedule_website, check_live_blocks, check_all, activate_test
 
 
-
 @shared_task(name='schedule all websites')
 def schedule_all_websites():
     websites = Website.objects.all()
@@ -45,3 +44,16 @@ def check_for_checklist():
     checklists = Checklist.objects.filter(~Q(status=6))
     for checklist in checklists:
         check_all(websiteId=checklist.website_id)
+
+
+@shared_task(name='reset_status_for_scans')
+def reset_status_for_scans():
+    """Check for tasks that haven't started yet """
+    scans = Scan.objects.filter(~Q(completed_at=None))
+
+    for scan in scans:
+        scan.completed_at = None
+        scan.status = Scan.STATUS.SITEMAP
+        scan.started_at = datetime.now()
+        scan.save(update_fields=['completed_at', 'started_at', 'status'])
+        activate_test(scanId=scan.id)

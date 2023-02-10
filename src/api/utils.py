@@ -27,10 +27,7 @@ def get_sitemap(website: Website):
     :param website: Give the components you want to get the sitemap from
     """
     # Go to the sitemap using Scrapy
-    spider = CrawlerProcess()
-    spider.settings
-    spider.crawl(SitemapSpider, url=website.url)
-    spider.start()
+    run_spider(SitemapSpider, urls=[website.url])
 
 
 # Based on the components that is from the database
@@ -45,9 +42,7 @@ def scan_page(website: Website):
     pages = website.pages.filter(website=website).distinct('url')
 
     if pages:
-        spider = CrawlerProcess()
-        spider.crawl(ContentSpider, urls=pages)
-        spider.start()
+        run_spider(ContentSpider, urls=pages)
 
 
 def scan_page_test(website: Website):
@@ -60,9 +55,7 @@ def scan_page_test(website: Website):
     pages = website.pages.filter(website=website).distinct('url')
 
     if pages:
-        spider = CrawlerProcess()
-        spider.crawl(CheckPageSpider, urls=pages)
-        spider.start()
+        run_spider(CheckPageSpider, urls=pages)
 
 
 def compare_blocks(website: Website):
@@ -94,9 +87,7 @@ def check_live_blocks(websiteId: uuid.UUID):
     pages = list(website.pages.filter(website=website).distinct('url'))
 
     if pages:
-        spider = CrawlerProcess()
-        spider.crawl(CompareSpider, urls=pages)
-        spider.start()
+        run_spider(CompareSpider, urls=pages)
 
 
 def check_for_deleted_blocks(websiteId: uuid.UUID):
