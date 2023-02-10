@@ -115,7 +115,16 @@ class Result(models.Model):
 
 
 class Scan(models.Model):
+    STATUS = Choices(
+        (1, 'SITEMAP', _('Sitemap')),
+        (2, 'GET_DATA', _('Get the data')),
+        (3, 'COMPARE_BLOCKS', _('Compare the blocks and check for deleted blocks')),
+        (4, 'COMPLETED', _('Completed')),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    status = models.CharField(max_length=50, null=False, choices=STATUS)
+
     website = models.ForeignKey(Website, on_delete=models.CASCADE, null=True, related_name='scan', default=3)
 
     created_at = models.DateTimeField(default=django.utils.timezone.now)
@@ -167,3 +176,24 @@ class Task(models.Model):
 
     created_at = models.DateTimeField(default=django.utils.timezone.now)
     completed_at = models.DateTimeField(blank=True, null=True)
+
+
+class PageValue(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    value = JSONField()
+
+    def __str__(self):
+        return self.value
+
+
+class PageResult(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, null=False, related_name='page_results', default=3)
+    page_value = models.ForeignKey(PageValue, on_delete=models.CASCADE, null=False, related_name='page_result',
+                                   default=3)
+
+    attribute = models.CharField(max_length=255, null=True)
+    className = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return self.attribute

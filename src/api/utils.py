@@ -6,13 +6,11 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.log import configure_logging
 
 from twisted.internet import reactor
-from src.api.models import Website, Page, Result, Block, Scan, Checklist, Task
-
-# Import the Content spider to get content from the components
-# And the sitemap for getting all the URLs
+from src.api.models import Website, Result, Scan, Checklist, Task, Page
 from src.api.spiders.check_google_analytics_spider import CheckGoogleAnalyticsSpider
 from src.api.spiders.check_metatag_spider import CheckMetaTagSpider
 from src.api.spiders.check_nice_urls_spider import CheckNiceUrlsSpider
+from src.api.spiders.check_page_spider import CheckPageSpider
 from src.api.spiders.check_robot_spider import CheckRobotSpider
 from src.api.spiders.check_sitemap_spider import CheckSitemapSpider
 from src.api.spiders.compare_blocks_spider import CompareSpider
@@ -29,10 +27,7 @@ def get_sitemap(website: Website):
     :param website: Give the components you want to get the sitemap from
     """
     # Go to the sitemap using Scrapy
-    spider = CrawlerProcess()
-    spider.settings
-    spider.crawl(SitemapSpider, url=website.url)
-    spider.start()
+    run_spider(SitemapSpider, urls=[website.url])
 
 
 # Based on the components that is from the database
@@ -47,9 +42,20 @@ def scan_page(website: Website):
     pages = website.pages.filter(website=website).distinct('url')
 
     if pages:
-        spider = CrawlerProcess()
-        spider.crawl(ContentSpider, urls=pages)
-        spider.start()
+        run_spider(ContentSpider, urls=pages)
+
+
+def scan_page_test(website: Website):
+    """
+        This function will go to a specifc page and retreive drupal content blocks
+
+        :param website: Give the components you want to get the sitemap from
+    """
+
+    pages = website.pages.filter(website=website).distinct('url')
+
+    if pages:
+        run_spider(CheckPageSpider, urls=pages)
 
 
 def compare_blocks(website: Website):
@@ -59,11 +65,11 @@ def compare_blocks(website: Website):
     :param website:
     :return:
     """
-    check_live_blocks(website)
+    check_live_blocks(websiteId=website.id)
     # After we checked through the blocks, we need to check if there are any deleted blocks,
     # we need to search for the block that ISN'T tested
 
-    check_for_deleted_blocks(website)
+    check_for_deleted_blocks(websiteId=website.id)
 
 
 def check_live_blocks(websiteId: uuid.UUID):
@@ -81,22 +87,21 @@ def check_live_blocks(websiteId: uuid.UUID):
     pages = list(website.pages.filter(website=website).distinct('url'))
 
     if pages:
-        spider = CrawlerProcess()
-        spider.crawl(CompareSpider, urls=pages)
-        spider.start()
+        run_spider(CompareSpider, urls=pages)
 
 
-def check_for_deleted_blocks(website: Website):
+def check_for_deleted_blocks(websiteId: uuid.UUID):
     """
     Check for deleted blocks, we search through all the blocks with the same test id
     Get the blocks based on the group id, compare the blocks on the page,
     if there is one missing, its deleted.
 
-    :param website:
+    :param websiteId:
     :return: If there is an deleted record, give back an array of results
     """
     # get all the pages based on the given url
-    pages = website.pages.filter(website=website)
+    website = Website.objects.filter(id=websiteId).first()
+    pages = Page.objects.filter(website=website)
 
     # Loop through the pages
     for page in pages:
@@ -128,13 +133,24 @@ def check_for_deleted_blocks(website: Website):
                     group_id=group_id,
                     checked=True
                 )
+    # if there are no pages to look for anymore,
+    # Get scan and set the scan to the next step
+    scan = Scan.objects.filter(website_id=website.id).first()
+    scan.status = Scan.STATUS.COMPLETED
+    scan.save()
 
 
 def schedule_website(websiteId: uuid.UUID):
     website = Website.objects.filter(id=websiteId).first()
+
+    # Get the sitemap
     schedule, created = Scan.objects.get_or_create(
         website=website
     )
+
+    # schedule it
+    schedule.status = Scan.STATUS[0]
+    schedule.save()
 
     return schedule
 
@@ -143,7 +159,6 @@ def schedule_checklist(websiteId: uuid.UUID):
     checklist = Checklist.objects.filter(website__id=websiteId).first()
     tasks = Task.objects.filter(check_list_id=checklist.id)
     for task in tasks:
-        print("{} task is deleted ".format(task.id))
         task.delete()
 
     checklist.status = 0
@@ -202,3 +217,17 @@ def run_spider(spider, *args, **kwargs):
 
     if result is not None:
         raise result
+
+
+def activate_test(scanId: uuid.UUID):
+    scan = Scan.objects.filter(id=scanId).first()
+
+    if str(scan.status) == str(Scan.STATUS.SITEMAP):
+        get_sitemap(scan.website)
+    elif str(scan.status) == str(Scan.STATUS.GET_DATA):
+        scan_page(scan.website)
+    elif str(scan.status) == str(Scan.STATUS.COMPARE_BLOCKS):
+        compare_blocks(scan.website)
+    elif str(scan.status) == str(Scan.STATUS.COMPLETED):
+        scan.completed_at = datetime.now()
+        scan.save()

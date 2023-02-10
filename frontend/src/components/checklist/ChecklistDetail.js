@@ -26,10 +26,9 @@ class ChecklistDetail extends Component {
     componentDidMount() {
         const {id} = this.props.match.params;
 
-        axios.get(`/websites/${id}/`).then(website => {
-            console.warn(website.data)
+        axios.get(`/websites/${id}/check`).then(website => {
             this.setState({
-                website: website.data,
+                website: website.data[0],
                 isActive: true,
             })
         }).catch(error => {
@@ -50,41 +49,41 @@ class ChecklistDetail extends Component {
                 </Spinner>
             </div>)
         }
-
         let tasks
-        if (this.state.website.checklist[0].task) {
-            if (this.state.website.checklist[0].task.length > 0) {
-                tasks = this.state.website.checklist[0].task.map((task, i) => {
-                        task.status = task.status.match(/'([^']+)'/)[1]
-                        task.type = task.type.match(/'([^']+)'/)[1]
-                        task.type = task.type.charAt(0) + task.type.substring(1).toLowerCase();
+        if (this.state.website.checklist) {
+            if (this.state.website.checklist[0].task) {
+                if (this.state.website.checklist[0].task.length > 0) {
+                    tasks = this.state.website.checklist[0].task.map((task, i) => {
+                            task.status = task.status.match(/'([^']+)'/)[1]
+                            task.type = task.type.match(/'([^']+)'/)[1]
+                            task.type = task.type.charAt(0) + task.type.substring(1).toLowerCase();
 
-                        let status = null;
-                        // Change to the last one in the array
-                        if (task.status === 'NOT_ACITVE') {
-                            status = 'grey'
-                        } else if (task.status === 'SUCCESS') {
-                            status = 'green'
-                        } else if (task.status === 'FAILED') {
-                            status = 'red'
+                            let status = null;
+                            // Change to the last one in the array
+                            if (task.status === 'NOT_ACITVE') {
+                                status = 'grey'
+                            } else if (task.status === 'SUCCESS') {
+                                status = 'green'
+                            } else if (task.status === 'FAILED') {
+                                status = 'red'
+                            }
+                            return (
+                                <tr key={task.id}>
+                                    <td><p style={{textTransform: 'capitalize'}}> {task.type}</p></td>
+                                    <td><p>{task.comment}</p></td>
+                                    <td>
+                                        <IconContext.Provider value={{color: status, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </td>
+                                    <td>{task.completed_at}</td>
+                                </tr>
+                            );
                         }
-                        return (
-                            <tr key={task.id}>
-                                <td><p style={{textTransform: 'capitalize'}}> {task.type}</p></td>
-                                <td><p>{task.comment}</p></td>
-                                <td>
-                                    <IconContext.Provider value={{color: status, textAlign: "center"}}>
-                                        <BsCircleFill/>
-                                    </IconContext.Provider>
-                                </td>
-                                <td>{task.completed_at}</td>
-                            </tr>
-                        );
-                    }
-                );
+                    );
+                }
             }
         }
-
         return (
 
             <div className="container">

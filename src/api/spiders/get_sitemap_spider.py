@@ -3,7 +3,7 @@ import logging
 import scrapy
 from scrapy import Selector
 
-from src.api.models import Page, Website
+from src.api.models import Page, Website, Scan
 
 
 class SitemapSpider(scrapy.Spider):
@@ -14,8 +14,7 @@ class SitemapSpider(scrapy.Spider):
         logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
-        urls = kwargs.get('urls')
-        url = urls[0]
+        url = kwargs.get('url')
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
@@ -31,20 +30,24 @@ class SitemapSpider(scrapy.Spider):
         self.website_id = website.id
 
     def parse(self, response, **kwargs):
-        links = response.text.split('\n')
-
+        # response.selector.register_namespace('d', 'http://www.sitemaps.org/schemas/sitemap/0.9')
+        # b = response.xpath('//d:loc')
+        links = response.xpath("//*[local-name()='loc']")
         for link in links:
             # Searching for <loc> and </loc> element
             # When found, strip and get the link
-            if link[:7].replace(" ", "") == '<loc>' and link[-6:].replace(" ", "") == '</loc>':
-                # Remove <loc>
-                link = link.replace(link[-6:], "")
-                # Remove </loc>
-                link = link.replace(link[:7], "")
 
+            url = link.xpath('text()').extract_first()
+            if url != "":
                 # add the page
                 page, created = Page.objects.get_or_create(
-                    url=link,
-                    name=link.rsplit('/', 1)[-1],
+                    url=url,
+                    name=url.rsplit('/', 1)[-1],
                     website_id=self.website_id
                 )
+
+
+        # Get scan and set the scan to the next step
+        scan = Scan.objects.filter(website_id=self.website_id).first()
+        scan.status = Scan.STATUS.GET_DATA
+        scan.save()

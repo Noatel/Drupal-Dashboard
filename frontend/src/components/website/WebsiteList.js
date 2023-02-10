@@ -14,7 +14,7 @@ class WebsiteList extends Component {
     componentDidMount() {
         axios.get("/websites/").then(response => {
             this.setState({
-                websites: response.data
+                websites: response.results
             })
         }).catch(error => {
             toastOnError(error);

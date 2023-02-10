@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-zmz_+njux90svs3#0ed9gjxl1&p8iw2@p$qh5=ig^c$x$5d%5)
 DEBUG = True
 
 ALLOWED_HOSTS = [
- "*"
+    "*"
 ]
 
 MEDIA_URL = '/media/'
@@ -160,7 +160,6 @@ EXTENSIONS = {
     'afstudeerOpdracht.extension.CustomLogExtension': 1,
 }
 
-CORS_ALLOW_ALL_ORIGINS = True  # Add this line too
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
@@ -168,6 +167,19 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:3000"
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True  # Add this line too
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -175,7 +187,9 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 25
 }
 
 ROOT_URLCONF = 'afstudeerOpdracht.urls'
@@ -219,3 +233,7 @@ TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_VERBOSE = 2
 TEST_OUTPUT_DESCRIPTIONS = True
 TEST_OUTPUT_FILE_NAME = 'junit.xml'
+
+handle_httpstatus_all = True
+handle_httpstatus_list = [404]
+HTTPERROR_ALLOWED_CODES = [404]

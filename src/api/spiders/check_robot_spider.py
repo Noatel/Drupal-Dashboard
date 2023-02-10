@@ -41,7 +41,11 @@ class CheckRobotSpider(scrapy.Spider):
         self.urls = []
         self.website_id = website.id
         self.website_url = website.url
-        self.status = 1
+        self.status = 2
+
+        self.handle_httpstatus_all = True
+        self.handle_httpstatus_list = [404]
+        self.HTTPERROR_ALLOWED_CODES = [404]
 
     def parse(self, response, **kwargs):
         """
@@ -53,32 +57,39 @@ class CheckRobotSpider(scrapy.Spider):
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
 
         robots = response.text.splitlines()
+        if response.status != 404:
+            try:
+                if robots[1] == '# robots.txt':
+                    # Based on the origin url get the checklist
+                    task = Task.objects.get_or_create(
+                        type=Task.TYPE[2],
+                        status=Task.STATUS[1],
+                        completed_at=datetime.now(),
+                        check_list=checklist,
+                        comment='Robots.txt found'
+                    )
 
-        try:
-            if robots[1] == '# robots.txt':
-                # Based on the origin url get the checklist
-                task = Task.objects.get_or_create(
-                    type=Task.TYPE[2],
-                    status=Task.STATUS[1],
-                    completed_at=datetime.now(),
-                    check_list=checklist,
-                    comment='Robots.txt found'
-                )
-
-                self.status = 3
-                checklist.status = 3
-                checklist.save()
-            else:
+                    self.status = 2
+                    checklist.status = 2
+                    checklist.save()
+                else:
+                    task = Task.objects.get_or_create(
+                        type=Task.TYPE[2],
+                        status=Task.STATUS[2],
+                        check_list=checklist,
+                        comment="Robots.txt not found"
+                    )
+            except Exception as e:
                 task = Task.objects.get_or_create(
                     type=Task.TYPE[2],
                     status=Task.STATUS[2],
                     check_list=checklist,
-                    comment="Robots.txt not found"
+                    comment=str(e)
                 )
-        except Exception as e:
+        else:
             task = Task.objects.get_or_create(
                 type=Task.TYPE[2],
                 status=Task.STATUS[2],
                 check_list=checklist,
-                comment=str(e)
+                comment="Robots.txt not found"
             )

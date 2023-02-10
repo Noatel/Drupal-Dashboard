@@ -1,11 +1,11 @@
 import React, {Component} from "react";
 import Table from "react-bootstrap/Table";
-import {AiFillExperiment, AiFillEye, BsCircleFill} from "react-icons/all";
+import {AiFillExperiment, AiFillEye, BsChevronDown, BsChevronUp, BsCircleFill, FaChevronUp} from "react-icons/all";
 import {IconContext} from "react-icons";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {Breadcrumb, Spinner} from "react-bootstrap";
+import {Accordion, Breadcrumb, Card, Spinner} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
 class Page extends Component {
@@ -18,7 +18,13 @@ class Page extends Component {
                 name: "",
                 url: "",
             },
+            results: null,
             isActive: false,
+
+            openHeader: false,
+            openId: false,
+            openAlt: false,
+            openOrder: false,
         };
 
         this.handlePageDetail = this.handlePageDetail.bind(this);
@@ -26,16 +32,32 @@ class Page extends Component {
         this.handleShow = this.handleShow.bind(this);
         this.handleShowHistory = this.handleShowHistory.bind(this);
         this.handleCloseHistory = this.handleCloseHistory.bind(this);
+        this.returnTable = this.returnTable.bind(this);
+
+        this.openHeader = this.openHeader.bind(this);
+        this.openAlt = this.openAlt.bind(this);
+        this.openId = this.openId.bind(this);
+        this.openOrder = this.openOrder.bind(this);
     }
 
     componentDidMount() {
         const {id} = this.props.match.params;
 
-        axios.get(`/pages/?page_id=${id}&blocks=true`).then(response => {
+        axios.get(`/pages/${id}/blocks`).then(response => {
             this.setState({
                 page: response.data[0],
+            })
+        }).catch(error => {
+            toastOnError(error);
+        });
+
+        axios.get(`/results/?page_id=${id}`).then(response => {
+
+            this.setState({
+                results: response.data.results,
                 isActive: true
             })
+
         }).catch(error => {
             toastOnError(error);
         });
@@ -71,6 +93,42 @@ class Page extends Component {
             showHistory: 'close'
         });
         return false;
+    }
+
+    openHeader(state) {
+        this.setState({
+            openHeader: state
+        })
+        return state
+    }
+
+    openAlt(state) {
+        this.setState({
+            openAlt: state
+        })
+        return state
+    }
+
+    openId(state) {
+        this.setState({
+            openId: state
+        })
+        return state
+    }
+
+    openOrder(state) {
+        this.setState({
+            openOrder: state
+        })
+        return state
+    }
+
+    returnTable(result) {
+        return (<tr key={result.id}>
+            <td>{result.attribute}  </td>
+            <td><p>{result.page_value.value}</p></td>
+            <td>{result.className}</td>
+        </tr>);
     }
 
 
@@ -165,6 +223,62 @@ class Page extends Component {
                     </tr>);
             });
         }
+
+        let resultsHeaders = [];
+        let resultsIds = [];
+        let resultsAlts = [];
+        let resultsOrders = [];
+
+        let metaTitle = "";
+        let metaDescription = "";
+
+        let statusHeader = 'grey'
+        let statusId = 'grey'
+        let statusAlt = 'grey'
+        let statusOrders = 'grey'
+        let descriptionColor = 'grey'
+        let titleColor = 'grey'
+
+        if (this.state.results.length > 0) {
+            this.state.results.forEach(result => {
+                if (result.attribute === 'h1') {
+                    resultsHeaders.push(result)
+                } else if (result.attribute === 'id') {
+                    resultsIds.push(result)
+                } else if (result.attribute === 'alt') {
+                    resultsAlts.push(result)
+                } else if (result.attribute === 'order') {
+                    resultsOrders.push(result)
+                } else if (result.attribute === 'meta') {
+                    metaTitle = result.page_value.value[0];
+                    metaDescription = result.page_value.value[1];
+                }
+            });
+
+            statusHeader = resultsHeaders.length > 0 ? 'red' : 'green'
+            statusId = resultsIds.length > 0 ? 'red' : 'green'
+            statusAlt = resultsAlts.length > 0 ? 'red' : 'green'
+            statusOrders = resultsOrders.length > 0 ? 'red' : 'green'
+            descriptionColor = metaDescription.length > 0 ? 'green' : 'red'
+            titleColor = metaTitle.length > 0 ? 'green' : 'red'
+
+
+            resultsHeaders = resultsHeaders.map(result => {
+                return (this.returnTable(result));
+            });
+
+            resultsIds = resultsIds.map(result => {
+                return (this.returnTable(result));
+            });
+
+            resultsAlts = resultsAlts.map(result => {
+                return (this.returnTable(result));
+            });
+
+            resultsOrders = resultsOrders.map(result => {
+                return (this.returnTable(result));
+            });
+        }
         return (
             <div className=" container">
                 <div className=" row">
@@ -184,12 +298,12 @@ class Page extends Component {
                         </p>
                         <div className=" form-group">
                             <label htmlFor=" name">Name:</label>
-                            <input type=" name" className=" form-control" readOnly={true} id=" name"
+                            <input type="name" className=" form-control" readOnly={true} id="name"
                                    value={this.state.page.name}/>
                         </div>
                         <div className=" form-group">
                             <label htmlFor=" url">Url:</label>
-                            <input type=" url" className=" form-control" readOnly={true} id=" url"
+                            <input type=" url" className=" form-control" readOnly={true} id="url"
                                    value={this.state.page.url}/>
                         </div>
                     </div>
@@ -199,9 +313,206 @@ class Page extends Component {
                     </div>
 
                     <div className=" col-md-10 mt-5">
+                        <div className=" form-group">
+                            <label htmlFor="meta_title">
+                                <div className="statusIcon">
+                                    <IconContext.Provider value={{color: titleColor, textAlign: "center"}}>
+                                        <BsCircleFill/>
+                                    </IconContext.Provider>
+                                </div>
+                                Meta title:</label>
+                            <input type="meta_title" className=" form-control" readOnly={true} id="url"
+                                   defaultValue={metaTitle}/>
+                        </div>
+                        <label htmlFor="meta_description">
+                            <div className="statusIcon">
+                                <IconContext.Provider value={{color: descriptionColor, textAlign: "center"}}>
+                                    <BsCircleFill/>
+                                </IconContext.Provider>
+                            </div>
+                            Meta description:</label>
+                        <textarea className="form-control" name="meta_description" id="" cols="30" rows="10" disabled
+                                  value={metaDescription}/>
+                    </div>
+                </div>
+
+
+                <div className=" row">
+                    <div className=" col-md-2">
+                    </div>
+
+                    <div className=" col-md-10 mt-5">
+                        <h2 className=" d-inline-block">SEO to perfection:</h2>
+                        <p>
+                            For the website to reach a high SEO, it need to follow a couple rules
+                        </p>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openHeader(!this.state.openHeader)}>
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusHeader, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                    There can only be <u>1</u> H1 on a page
+                                    {this.state.openHeader ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsHeaders.length > 0 ?
+                                                    <div>
+                                                        <h4>There is no repeated ID's being used</h4>
+                                                        <Table className="tableBlock" striped bordered hover
+                                                               size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsHeaders}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> is only 1 H1 on the webpage! </p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openId(!this.state.openId)}>
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusId, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                    There is no repeated ID's being used
+                                    {this.state.openId ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsIds.length > 0 ?
+                                                    <div>
+                                                        <Table className="tableBlock" striped bordered hover size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsIds}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> There are no duplicate ID's on this page!</p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openAlt(!this.state.openAlt)}>
+
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusAlt, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                    Image need <u>alt</u> text
+                                    {this.state.openAlt ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsAlts.length > 0 ?
+                                                    <div>
+                                                        <Table className="tableBlock" striped bordered hover
+                                                               size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsAlts}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> All Alt text are filled in correctly! </p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                        <Accordion defaultActiveKey="0">
+                            <Card>
+                                <Accordion.Toggle as={Card.Header} eventKey="1"
+                                                  onClick={() => this.openOrder(!this.state.openOrder)}>
+                                    <div className="statusIcon">
+                                        <IconContext.Provider value={{color: statusOrders, textAlign: "center"}}>
+                                            <BsCircleFill/>
+                                        </IconContext.Provider>
+                                    </div>
+                                    Headers need to be alphanumerics (h1, h2, h3, h4, h5, h6)
+                                    {this.state.openOrder ? <BsChevronUp className="accordian-drop"/> :
+                                        <BsChevronDown className="accordian-drop"/>}
+                                </Accordion.Toggle>
+                                <Accordion.Collapse eventKey="1">
+                                    <Card.Body>
+                                        <div className=" row">
+                                            <div className=" col-md-12">
+                                                {resultsOrders.length > 0 ?
+                                                    <div>
+                                                        <Table className="tableBlock" striped bordered hover
+                                                               size="sm">
+                                                            <thead className="thead-page">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Name</th>
+                                                                <th>Class</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {resultsOrders}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div> : <p> The order of the headers is done correctly! </p>}
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        </Accordion>
+                    </div>
+                </div>
+                <div className=" row">
+                    <div className=" col-md-2">
+                    </div>
+                    <div className=" col-md-10 mt-5">
                         <h2 className=" d-inline-block">Content blocks:</h2>
                         <p>The Drupal custom blocks that exsist on the page <br/>
-                            You can check out the content what is in the block or the tests results (If there is any)
+                            You can check out the content what is in the block or the tests results (If there is
+                            any)
                         </p>
                         <ol>
                             <li>Green: Nothing changed</li>
@@ -230,7 +541,8 @@ class Page extends Component {
                     <hr/>
                 </div>
             </div>
-        );
+        )
+            ;
     }
 }
 

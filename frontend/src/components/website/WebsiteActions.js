@@ -16,6 +16,17 @@ export const getWebsites = () => dispatch => {
         });
 };
 
+export const getWebsiteWithPages = id => dispatch => {
+    axios.get(`/websites/${id}/pages`).then(response => {
+        this.setState({
+            results: response.data[0],
+            isActive: true
+        })
+    }).catch(error => {
+        toastOnError(error);
+    });
+};
+
 export const setWebsite = website => dispatch => {
     dispatch({
         type: SET_website,

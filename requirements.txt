@@ -39,3 +39,4 @@ twisted==22.10.0
 django-nose==1.4.7
 coverage==7.0.5
 billiard==3.6.4.0
+textblob==0.17.1

@@ -1,22 +1,24 @@
 from django.core.management import BaseCommand
-from scrapy.crawler import CrawlerProcess
 
 from src.api.models import Website
-from src.api.utils import check_all
+from src.api.utils import check_for_deleted_blocks, scan_page_test, activate_test
 
 
 class Command(BaseCommand):
-    help = 'Check if the sitemap exsist'
+    help = 'Activate a spider for testing a page'
 
     def add_arguments(self, parser):
-        parser.add_argument('-t', '--type', type=str, help="Type")
         parser.add_argument('-w', '--components', type=str, help="Add a components")
 
     def handle(self, *args, **kwargs):
-        type = kwargs['type']
         website = kwargs['components']
         db_website = Website.objects.filter(url=website).first()
-        process = CrawlerProcess()
 
         if db_website:
-            check_all(websiteId=db_website.id)
+            activate_test(scanId='33b4d29f-34ee-46e8-9454-7a1d3217280b')
+            # scan_page_test(website=db_website)
+
+
+
+
+

@@ -1,6 +1,6 @@
 import logging
 import scrapy
-from src.api.models import Block, Content
+from src.api.models import Block, Content, Scan, Page
 from bs4 import BeautifulSoup
 
 
@@ -21,6 +21,8 @@ class ContentSpider(scrapy.Spider):
         self.url_position = 0
         self.urls = urls
         self.testing = False
+        page = Page.objects.filter(url=urls[0].url).first()
+        self.website = page.website
 
     def parse(self, response, **kwargs):
         page = self.urls[self.url_position]
@@ -60,6 +62,12 @@ class ContentSpider(scrapy.Spider):
                 yield scrapy.Request(url, callback=self.parse)
             except IndexError:
                 pass
+        else:
+            # if there are no pages to look for anymore,
+            # Get scan and set the scan to the next step
+            scan = Scan.objects.filter(website_id=self.website.id).first()
+            scan.status = Scan.STATUS.COMPARE_BLOCKS
+            scan.save()
 
 
 def filter_blocks(response):
