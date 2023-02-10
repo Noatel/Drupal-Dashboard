@@ -168,7 +168,6 @@ def schedule_checklist(websiteId: uuid.UUID):
     checklist = Checklist.objects.filter(website__id=websiteId).first()
     tasks = Task.objects.filter(check_list_id=checklist.id)
     for task in tasks:
-        print("{} task is deleted ".format(task.id))
         task.delete()
 
     checklist.status = 0
@@ -231,9 +230,6 @@ def run_spider(spider, *args, **kwargs):
 
 def activate_test(scanId: uuid.UUID):
     scan = Scan.objects.filter(id=scanId).first()
-    print(str(scan.status))
-    print(str(Scan.STATUS.GET_DATA))
-    print(str(scan.status) == str(Scan.STATUS.GET_DATA))
 
     if str(scan.status) == str(Scan.STATUS.SITEMAP):
         get_sitemap(scan.website)

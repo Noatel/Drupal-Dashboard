@@ -69,7 +69,6 @@ class WebsiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
         """
         Schedule a task in based on website id
         """
-        print('schedulinggg aa fcking test')
         schedule = schedule_website(websiteId=pk)
         return Response(data='Scheduled', status=status.HTTP_201_CREATED, content_type="application/json")
 
@@ -173,8 +172,6 @@ class ResultViewSet(viewsets.ModelViewSet):
         if self.request.GET.get('page_id'):
             id = self.request.GET.get('page_id')
             page_results = PageResult.objects.filter(page__id=id)
-            print(id)
-            print(page_results)
         else:
             page_results = self.queryset.filter()
         return page_results

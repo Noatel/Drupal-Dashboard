@@ -7,10 +7,6 @@ from src.api.models import Website, Scan, Checklist
 from src.api.utils import schedule_website, check_live_blocks, check_all, activate_test
 
 
-@shared_task(name='testing')
-def hello():
-    print("Hello there!")
-
 
 @shared_task(name='schedule all websites')
 def schedule_all_websites():
@@ -36,7 +32,6 @@ def check_for_deleted_blocks():
     """Check for deleted contenblocks """
     scans = Scan.objects.filter(started_at=None)
 
-    print('currently {} scans found'.format(len(scans)))
     for scan in scans:
         scan.started_time = datetime.now()
         scan.save()

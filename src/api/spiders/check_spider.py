@@ -31,13 +31,9 @@ class CheckSitemapSpider(scrapy.Spider):
         self.website_id = website.id
 
     def parse(self, response, **kwargs):
-        print(response.text)
         xml = response.xpath('/').extract()
-        print(xml)
         xml = response.xpath('urlset').extract()
-        print(xml)
         xml = response.xpath('/urlset').extract()
-        print(xml)
         # print(xml[:7].replace(" ", "") )
         # if xml[:7].replace(" ", "") == '<?xml>':
         #     pas

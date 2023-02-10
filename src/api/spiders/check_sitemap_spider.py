@@ -37,7 +37,6 @@ class CheckSitemapSpider(scrapy.Spider):
         sitemap_url = format_url(url, '/sitemap.xml')
 
         # Set it to a self so I can access it later
-        print('start url {}'.format(sitemap_url))
         self.start_urls = [sitemap_url]
         self.start_url = sitemap_url
         self.urls = []
