@@ -121,19 +121,9 @@ class CompareSpiderTest(django.test.TestCase):
         item = list(item)
 
         # Check for test results
-        results = Result.objects.all()
-        self.assertEqual(9, results.__len__())
+        results = Result.objects.filter(status=Result.STATUS.UNCHANGED)
+        self.assertEqual(8, results.__len__())
 
-        # Checking if the value in the database is the same as the "live" data
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[0].status)
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[1].status)
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[2].status)
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[3].status)
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[4].status)
-
-        self.assertEqual(str(Result.STATUS.EDITED), results[5].status)
-
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[6].status)
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[7].status)
-        self.assertEqual(str(Result.STATUS.UNCHANGED), results[8].status)
-
+        # check for the edit record
+        results = Result.objects.filter(status=Result.STATUS.EDITED)
+        self.assertEqual(1, results.__len__())

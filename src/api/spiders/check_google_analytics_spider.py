@@ -8,19 +8,6 @@ from scrapy import Selector
 from src.api.models import Website, Checklist, Task
 
 
-def format_url(url, second_url):
-    """
-    Function where it checks if the URL ends with a slash and add something behind
-    :param url: First URL
-    :param second_url:  Second URL
-    :return:
-    """
-    if url.endswith('/'):
-        return url + second_url
-    else:
-        return url + second_url
-
-
 class CheckGoogleAnalyticsSpider(scrapy.Spider):
     name = 'Google Analytics spider'
 

@@ -1,6 +1,8 @@
+import csv
 import uuid
 from datetime import datetime
 
+import requests
 from scrapy import crawler
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.log import configure_logging

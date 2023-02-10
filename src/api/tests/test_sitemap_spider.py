@@ -2,7 +2,7 @@ import unittest
 
 import django
 
-from src.api.models import Website, Page
+from src.api.models import Website, Page, Scan
 from src.api.spiders.get_sitemap_spider import SitemapSpider
 from src.api.tests.responses import fake_response
 
@@ -12,12 +12,16 @@ class SitemapSpiderTest(django.test.TestCase):
         # Since its a different database
         # You need to make a new website
         self.website = Website.objects.create(
-            urls='https://www.typify.com',
+            url='https://www.typify.com',
             name='Typify',
             description='Typify',
             image='testImage'
         )
 
+        self.scan = Scan.objects.create(
+            website=self.website,
+            status=Scan.STATUS.SITEMAP
+        )
         # Initialize the spider
         self.spider = SitemapSpider(urls=['https://www.typify.com'])
 
@@ -30,6 +34,10 @@ class SitemapSpiderTest(django.test.TestCase):
               """
 
         # Check if there aren't any pages in the database
+
+        scan = Scan.objects.filter(website=self.website).first()
+        self.assertEqual(str(Scan.STATUS.SITEMAP), scan.status)
+
         page = Page.objects.filter(website__url='https://www.typify.com')
         self.assertEqual(0, page.__len__())
 
@@ -43,6 +51,9 @@ class SitemapSpiderTest(django.test.TestCase):
         pages = Page.objects.filter(website__url='https://www.typify.com')
         self.assertEqual(65, pages.__len__())
 
+        scan = Scan.objects.filter(website=self.website).first()
+        self.assertEqual(str(Scan.STATUS.GET_DATA), scan.status)
+
     def test_sitemap_not_found(self):
         """
             Test scenario where the sitemap sider is being tested and get the wrong HTML (No sitemap)
@@ -52,6 +63,9 @@ class SitemapSpiderTest(django.test.TestCase):
         # Check if there aren't any pages in the database
         page = Page.objects.filter(website__url='https://www.typify.com')
         self.assertEqual(0, page.__len__())
+
+        scan = Scan.objects.filter(website=self.website).first()
+        self.assertEqual(str(Scan.STATUS.SITEMAP), scan.status)
 
         # Mock the response
         response = fake_response(file_name='html/error.html', url='https://www.typify.com')
@@ -63,3 +77,6 @@ class SitemapSpiderTest(django.test.TestCase):
         # The system makes 0 pages
         page = Page.objects.filter(website__url='https://www.typify.com')
         self.assertEqual(0, page.__len__())
+
+        scan = Scan.objects.filter(website=self.website).first()
+        self.assertEqual(str(Scan.STATUS.SITEMAP), scan.status)

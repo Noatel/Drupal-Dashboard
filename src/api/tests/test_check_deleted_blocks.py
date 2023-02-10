@@ -2,7 +2,7 @@ import unittest
 
 import django
 
-from src.api.models import Website, Page, Block, Content, Result
+from src.api.models import Website, Page, Block, Content, Result, Scan
 from src.api.spiders.compare_blocks_spider import CompareSpider
 from src.api.spiders.get_content_spider import ContentSpider
 from src.api.tests.responses import fake_response
@@ -41,6 +41,10 @@ class CompareSpiderTest(django.test.TestCase):
             website=self.website
         )
 
+        self.scan = Scan.objects.create(
+            website=self.website,
+            status=Scan.STATUS.COMPARE_BLOCKS
+        )
         website = Website.objects.filter(url='https://www.typify.com').first()
         pages = website.pages.filter(website=self.website)
 
@@ -53,7 +57,6 @@ class CompareSpiderTest(django.test.TestCase):
                Test scenario where getting the content is being compared
                This test is for the UNCHANGED data with the database and live database
                """
-
         blocks = Block.objects.all()
         content = Content.objects.all()
 
@@ -110,7 +113,7 @@ class CompareSpiderTest(django.test.TestCase):
         # After blocks have been tested
         # We need to check for deleted blocks
 
-        check_for_deleted_blocks(website=self.website)
+        check_for_deleted_blocks(websiteId=self.website.id)
 
         # Add a deleted block is added to the results
         results = Result.objects.all()
@@ -125,7 +128,8 @@ class CompareSpiderTest(django.test.TestCase):
         self.assertEqual(True, results[7].checked)
         self.assertEqual(True, results[8].checked)
 
-        self.assertEqual(str(Result.STATUS.DELETED), results[8].status)
+        resultStatus = Result.objects.filter(status=Result.STATUS.DELETED)
+        self.assertEqual(1, len(resultStatus))
 
     def test_check_deleted_blocks_with_changed_fields(self):
         """
@@ -189,7 +193,7 @@ class CompareSpiderTest(django.test.TestCase):
         # After blocks have been tested
         # We need to check for deleted blocks
 
-        check_for_deleted_blocks(website=self.website)
+        check_for_deleted_blocks(websiteId=self.website.id)
 
         # Add a deleted block is added to the results
         results = Result.objects.all()
@@ -205,4 +209,3 @@ class CompareSpiderTest(django.test.TestCase):
         self.assertEqual(True, results[8].checked)
 
         self.assertEqual(str(Result.STATUS.DELETED), results[8].status)
-

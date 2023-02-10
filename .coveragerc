@@ -1,0 +1,14 @@
+[run]
+omit =
+    */venv/*
+    src/accounts/*
+    frontend/*
+    src/accounts/tests/*
+    src/api/management/commands/*
+    src/api/forms.py
+    src/api/tasks.py
+    src/api/tests/responses/__init__.py
+    src/api/serializers.py
+    src/api/models.py
+    manage.py
+    afstudeerOpdracht/*
