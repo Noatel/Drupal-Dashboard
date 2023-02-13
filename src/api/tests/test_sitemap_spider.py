@@ -23,7 +23,8 @@ class SitemapSpiderTest(django.test.TestCase):
             status=Scan.STATUS.SITEMAP
         )
         # Initialize the spider
-        self.spider = SitemapSpider(urls=['https://www.typify.com'])
+        self.url = 'https://www.typify.com'
+        self.spider = SitemapSpider(urls=[self.url])
 
     def test_sitemap(self):
         """

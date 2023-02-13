@@ -10,5 +10,6 @@ omit =
     src/api/tests/responses/__init__.py
     src/api/serializers.py
     src/api/models.py
+    src/api/migrations/*
     manage.py
     afstudeerOpdracht/*

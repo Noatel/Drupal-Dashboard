@@ -54,7 +54,6 @@ class CheckMetaTagSpider(scrapy.Spider):
               :param response: Response of the website, {website_url}/sitemap.xml
               :return: Return if the sitemap exist, if it does return true otherwise false
         """
-
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
         meta_description = response.xpath("//meta[@name='description']/@content").extract()
         check_description = len(meta_description) > 0
@@ -68,7 +67,6 @@ class CheckMetaTagSpider(scrapy.Spider):
 
         title = response.xpath("//title/text()").extract()
         check_title = title == ""
-
         if check_title:
             self.check_title = check_title
             self.titles.append(self.start_url)

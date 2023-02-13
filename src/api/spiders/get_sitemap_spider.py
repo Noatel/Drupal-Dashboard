@@ -19,6 +19,7 @@ class SitemapSpider(scrapy.Spider):
         website = Website.objects.filter(url=url).first()
 
         # If the end url ends with a slash add sitemap else /sitemap
+
         if url.endswith('/'):
             sitemap_url = url + 'sitemap.xml'
         else:

@@ -4,7 +4,7 @@ from celery import shared_task
 from django.db.models import Q
 
 from src.api.models import Website, Scan, Checklist
-from src.api.utils import schedule_website, check_live_blocks, check_all, activate_test
+from src.api.utils import schedule_website, check_live_blocks, check_all, activate_test, scan_page_test
 
 
 @shared_task(name='schedule all websites')
@@ -44,6 +44,14 @@ def check_for_checklist():
     checklists = Checklist.objects.filter(~Q(status=6))
     for checklist in checklists:
         check_all(websiteId=checklist.website_id)
+
+
+@shared_task(name='run_page_scan')
+def run_page_scan():
+    """Check for tasks that haven't completed yet """
+    checklists = Checklist.objects.filter(~Q(status=6))
+    for checklist in checklists:
+        scan_page_test(websiteId=checklist.website_id)
 
 
 @shared_task(name='reset_status_for_scans')

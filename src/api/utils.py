@@ -47,14 +47,15 @@ def scan_page(website: Website):
         run_spider(ContentSpider, urls=pages)
 
 
-def scan_page_test(website: Website):
+def scan_page_test(websiteId: uuid.UUID):
     """
         This function will go to a specifc page and retreive drupal content blocks
 
         :param website: Give the components you want to get the sitemap from
     """
 
-    pages = website.pages.filter(website=website).distinct('url')
+    website = Website.objects.filter(websiteId=websiteId).first()
+    pages = website.pages.filter(websiteId=websiteId).distinct('url')
 
     if pages:
         run_spider(CheckPageSpider, urls=pages)
