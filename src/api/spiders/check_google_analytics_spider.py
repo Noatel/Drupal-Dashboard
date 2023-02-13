@@ -47,7 +47,6 @@ class CheckGoogleAnalyticsSpider(scrapy.Spider):
         # if the text Google Analytics is found in the scripttags
         if 'google_analytics' in str(script_tags[0]):
             google_analytics = True
-
         try:
             # If the 'google_analytics' is found in the script tag
             if google_analytics:

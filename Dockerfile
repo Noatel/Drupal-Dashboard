@@ -22,4 +22,6 @@ COPY requirements.txt /app
 RUN pip install -r requirements.txt
 
 COPY . /app
+COPY /src/api/tests /app/src/api/tests
+
 RUN chmod -R 777 /app

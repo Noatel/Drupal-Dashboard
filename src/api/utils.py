@@ -176,27 +176,36 @@ def check_all(websiteId: uuid.UUID):
     configure_logging()
     # Set up the spiders
 
-    # ('NOT_STARTED', _('Not started')),
+    # FROM: Status[0] - Not started
+    # TO: Status[1] - Sitemap
     if checklist.status == '0':
         run_spider(CheckSitemapSpider, urls=[website.url])
 
-    # ('SITEMAP', _('Sitemap')),
+    # FROM: Status[1] - Sitemap
+    # TO: Status[2] - Robots
     if checklist.status == '1':
         run_spider(CheckRobotSpider, urls=[website.url])
 
-    # ('ROBOTS', _('Robots')),
+    # FROM: Status[2] - Robots
+    # TO: Status[3] - MetaTags
     if checklist.status == '2':
         run_spider(CheckMetaTagSpider, urls=pages)
 
-    # ('GOOGLE', _('Google Analytics')),
+    # FROM: Status[3] - MetaTags
+    # TO: Status[4] - Google Analytics
     if checklist.status == '3':
         run_spider(CheckGoogleAnalyticsSpider, urls=[website.url])
 
-    # ('METATAGS', _('Meta tags')),
+    # FROM: Status[4] - Google analytics
+    # TO: Status[5] - Nice URL's
     if checklist.status == '4':
         run_spider(CheckNiceUrlsSpider, urls=pages)
 
-    # ('COMPLETED', _('Completed')),
+    # FROM: Status - Nice Url's
+    # TO: Status - Completed
+    if checklist.status == '5':
+        checklist.status = 6
+        checklist.save()
 
 
 def run_spider(spider, *args, **kwargs):
