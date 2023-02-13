@@ -23,10 +23,12 @@ class GoogleAnalyticsSpiderTest(django.test.TestCase):
             status=Scan.STATUS.SITEMAP
         )
 
-        self.checklist = Checklist.objects.create(
-            status=3,
-            website=self.website
-        )
+
+        # Since there is a checklist being created when doing the website.create
+        self.checklist = Checklist.objects.filter(website=self.website).first()
+        self.checklist.status = '3'
+        self.checklist.save()
+        
         # Initialize the spider
         self.spider = CheckGoogleAnalyticsSpider(urls=['https://www.typify.com'])
 
