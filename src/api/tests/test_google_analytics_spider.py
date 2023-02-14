@@ -28,7 +28,7 @@ class GoogleAnalyticsSpiderTest(django.test.TestCase):
         self.checklist = Checklist.objects.filter(website=self.website).first()
         self.checklist.status = '3'
         self.checklist.save()
-        
+
         # Initialize the spider
         self.spider = CheckGoogleAnalyticsSpider(urls=['https://www.typify.com'])
 

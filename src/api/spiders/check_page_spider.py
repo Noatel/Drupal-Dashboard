@@ -1,10 +1,7 @@
 import logging
-import sys
-import uuid
 
 import scrapy
-from src.api.models import Block, Content, PageResult, PageValue
-from bs4 import BeautifulSoup
+from src.api.models import PageResult, PageValue
 
 
 class CheckPageSpider(scrapy.Spider):

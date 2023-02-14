@@ -57,7 +57,6 @@ class CheckRobotSpider(scrapy.Spider):
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
         robots = response.text.splitlines()
 
-
         if response.status != 404:
             try:
                 if robots[1] == '# robots.txt':
