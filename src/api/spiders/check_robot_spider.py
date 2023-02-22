@@ -25,15 +25,14 @@ class CheckRobotSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         # Disable the logging (Not needed)
-        logging.getLogger('scrapy').propagate = False
+        # logging.getLogger('scrapy').propagate = False
 
         # Set the URL from the argument to a variable
         pages = kwargs.get('urls')
         page = pages[0]
-        website = Website.objects.filter(url=page.url).first()
-
+        website = Website.objects.filter(url=page).first()
         # If the end url ends with a slash add sitemap else /sitemap
-        robot_url = format_url(page.url, '/robots.txt')
+        robot_url = format_url(page, '/robots.txt')
 
         # Set it to a self so I can access it later
         self.start_urls = [robot_url]
@@ -56,9 +55,9 @@ class CheckRobotSpider(scrapy.Spider):
 
         checklist = Checklist.objects.filter(website__id=self.website_id).first()
         robots = response.text.splitlines()
-
         if response.status != 404:
             try:
+                print(robots[1])
                 if robots[1] == '# robots.txt':
                     # Based on the origin url get the checklist
                     task = Task.objects.get_or_create(

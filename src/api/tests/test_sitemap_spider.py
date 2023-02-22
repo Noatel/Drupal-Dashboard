@@ -34,8 +34,6 @@ class SitemapSpiderTest(django.test.TestCase):
               After the test 65 pages
               """
 
-        # Check if there aren't any pages in the database
-
         scan = Scan.objects.filter(website=self.website).first()
         self.assertEqual(str(Scan.STATUS.SITEMAP), scan.status)
 
