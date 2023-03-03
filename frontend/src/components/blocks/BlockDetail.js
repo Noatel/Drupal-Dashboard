@@ -35,7 +35,6 @@ class BlockDetail extends Component {
             this.setState({
                 block: block.data, isActive: true,
             })
-            console.warn(this.state.block);
         }).catch(error => {
             toastOnError(error);
         });
@@ -45,7 +44,6 @@ class BlockDetail extends Component {
         this.setState({
             changedContent: result
         })
-        console.warn(result)
     }
 
     getStatus(status) {
@@ -123,7 +121,6 @@ class BlockDetail extends Component {
             status = this.getStatus(this.state.changedContent.status)
             newValue = this.state.changedContent
         }
-        console.warn(status)
         return (<div className="container">
             <div className="row">
                 <div className="col-md-2">
