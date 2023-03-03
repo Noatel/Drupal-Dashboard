@@ -1,12 +1,12 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import Table from "react-bootstrap/Table";
-import {AiFillExperiment, AiFillEye, BsChevronDown, BsChevronUp, BsCircleFill} from "react-icons/all";
-import {IconContext} from "react-icons";
+import { AiFillExperiment, AiFillEye, BsChevronDown, BsChevronUp, BsCircleFill } from "react-icons/all";
+import { IconContext } from "react-icons";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
-import {toastOnError} from "../../utils/Utils";
-import {Accordion, Breadcrumb, Card, Spinner} from "react-bootstrap";
-import {Link} from "react-router-dom";
+import { toastOnError } from "../../utils/Utils";
+import { Accordion, Breadcrumb, Card, Spinner } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 class Page extends Component {
     constructor(props) {
@@ -41,7 +41,7 @@ class Page extends Component {
     }
 
     componentDidMount() {
-        const {id} = this.props.match.params;
+        const { id } = this.props.match.params;
 
         axios.get(`/pages/${id}/blocks`).then(response => {
             this.setState({
@@ -279,39 +279,47 @@ class Page extends Component {
         }
         return (
             <div className=" container">
-                <div className=" row">
-                    <div className=" col-md-2">
-                    </div>
-                    <div className=" col-md-6 mt-5">
-                        <Breadcrumb>
+                <div className="row">
+                    <div className="col-md-12">
+                         <Breadcrumb>
                             <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>
                             <Breadcrumb.Item onClick={this.props.history.goBack}>Website details</Breadcrumb.Item>
                             <Breadcrumb.Item active>Page details</Breadcrumb.Item>
                         </Breadcrumb>
-
-                        <h1>Page information</h1>
-                        <p>
-                            Some basic information about the current page <br/>
-                            this includes currently the Drupal custom blocks and their tests
-                        </p>
-                        <div className=" form-group">
-                            <label htmlFor=" name">Name:</label>
-                            <input type="name" className=" form-control" readOnly={true} id="name"
-                                   value={this.state.page.name}/>
-                        </div>
-                        <div className=" form-group">
-                            <label htmlFor=" url">Url:</label>
-                            <input type=" url" className=" form-control" readOnly={true} id="url"
-                                   value={this.state.page.url}/>
-                        </div>
                     </div>
                 </div>
-                <div className=" row">
-                    <div className=" col-md-2">
+                <div className="row">
+                    <div className=" col-md-6">
+                        <h2>Page information</h2>
+                        <div className="display-card">
+                            <p>
+                                Some basic information about the current page <br/>
+                                this includes currently the Drupal custom blocks and their tests
+                            </p>
+                            <div className=" form-group">
+                                <label htmlFor=" name">Name:</label>
+                                <input type="name" className=" form-control" readOnly={true} id="name"
+                                       value={this.state.page.name}/>
+                            </div>
+                            <div className=" form-group">
+                                <label htmlFor=" url">Url:</label>
+                                <input type=" url" className=" form-control" readOnly={true} id="url"
+                                       value={this.state.page.url}/>
+                            </div>
+                            </div>
+                              <div className="display-card mt-4">
+                            <p> Page speed </p>  
+                             <div className=" form-group">
+                                <label htmlFor=" url"></label>
+                                <input type=" url" className=" form-control" readOnly={true} id="url"
+                                       value={"300ms"}/>
+                            </div>
+
+                        </div>
                     </div>
 
-                    <div className=" col-md-10 mt-5">
-                        <div className=" form-group">
+                    <div className="col-md-6 mt-5">
+                        <div className="form-group display-card">
                             <label htmlFor="meta_title">
                                 <div className="statusIcon">
                                     <IconContext.Provider value={{color: titleColor, textAlign: "center"}}>
@@ -322,6 +330,7 @@ class Page extends Component {
                             <input type="meta_title" className=" form-control" readOnly={true} id="url"
                                    defaultValue={metaTitle}/>
                         </div>
+                        <div className="display-card">
                         <label htmlFor="meta_description">
                             <div className="statusIcon">
                                 <IconContext.Provider value={{color: descriptionColor, textAlign: "center"}}>
@@ -331,15 +340,12 @@ class Page extends Component {
                             Meta description:</label>
                         <textarea className="form-control" name="meta_description" id="" cols="30" rows="10" disabled
                                   value={metaDescription}/>
+                        </div>
                     </div>
                 </div>
-
-
-                <div className=" row">
-                    <div className=" col-md-2">
-                    </div>
-
-                    <div className=" col-md-10 mt-5">
+                <div className="row">
+                    <div className="col-md-12 mt-5">
+                        <div className="display-card">
                         <h2 className=" d-inline-block">SEO to perfection:</h2>
                         <p>
                             For the website to reach a high SEO, it need to follow a couple rules
@@ -502,45 +508,45 @@ class Page extends Component {
                             </Card>
                         </Accordion>
                     </div>
+                    </div>
                 </div>
                 <div className=" row">
-                    <div className=" col-md-2">
-                    </div>
-                    <div className=" col-md-10 mt-5">
-                        <h2 className=" d-inline-block">Content blocks:</h2>
-                        <p>The Drupal custom blocks that exsist on the page <br/>
-                            You can check out the content what is in the block or the tests results (If there is
-                            any)
-                        </p>
-                        <ol>
-                            <li>Green: Nothing changed</li>
-                            <li>Orange: Something changed</li>
-                            <li>Red: Block deleted</li>
-                        </ol>
-                        <div className=" row">
-                            <div className=" col-md-12">
-                                <Table className="tableBlock" striped bordered hover size="sm">
-                                    <thead className="thead-page">
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Name</th>
-                                        <th>Type</th>
-                                        <th>Content</th>
-                                        <th>Tests</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {blocks}
-                                    </tbody>
-                                </Table>
+                    <div className=" col-md-12 mt-5">
+                        <div className="display-card">
+                            <h2 className=" d-inline-block">Content blocks:</h2>
+                            <p>The Drupal custom blocks that exsist on the page <br/>
+                                You can check out the content what is in the block or the tests results (If there is
+                                any)
+                            </p>
+                            <ol>
+                                <li>Green: Nothing changed</li>
+                                <li>Orange: Something changed</li>
+                                <li>Red: Block deleted</li>
+                            </ol>
+                            <div className=" row">
+                                <div className=" col-md-12">
+                                    <Table className="tableBlock" striped bordered hover size="sm">
+                                        <thead className="thead-page">
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Content</th>
+                                            <th>Tests</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {blocks}
+                                        </tbody>
+                                    </Table>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <hr/>
                 </div>
             </div>
-        )
-            ;
+        );
     }
 }
 

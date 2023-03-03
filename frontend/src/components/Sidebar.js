@@ -1,25 +1,37 @@
 import React, {Component} from "react";
-import {Nav} from "react-bootstrap";
+import {Menu, MenuItem, Sidebar} from "react-pro-sidebar";
 import {Link} from "react-router-dom";
+import {FiLogOut, IoPeopleCircleSharp, TiEquals} from "react-icons/all";
+import {IconContext} from "react-icons";
 
 
 class SideBar extends Component {
-    render() {
-        return (
-            <Nav
-                className="col-md-2 d-none d-md-block bg-light sidebar pl-4"
-                activeKey="/home"
-                onSelect={selectedKey => alert(`selected ${selectedKey}`)}>
-                <img src="/logo.png" alt="Typify"/>
-                {/*<WebsiteList/>*/}
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
-                <div className="mt-5">
-                    <Link to={"/clients"} key={1}>
-                        Clients
-                    </Link>
-                </div>
-            </Nav>
-        );
+    render() {
+        return (<div className={"sidebar"}>
+                <Sidebar style={{height: "90vh"}} backgroundColor={"white"}>
+                    <Menu iconShape="square">
+                        <MenuItem className={"sidebar-item"}>
+                            <h2 className={"sidebar-header"}> Typify
+                                <IconContext.Provider value={{color: '#2daae1', textAlign: "center"}}>
+                                    <TiEquals/>
+                                </IconContext.Provider>
+                            </h2>
+                        </MenuItem>
+                        <MenuItem component={<Link to="/clients" key={1}/>} icon={<IoPeopleCircleSharp/>}
+                                  className={"sidebar-item"}> Clients </MenuItem>
+                    </Menu>
+                </Sidebar>
+                <Sidebar style={{height: "10vh"}} backgroundColor={"white"}>
+                    <Menu iconShape="square">
+                        <MenuItem icon={<FiLogOut/>}>Logout</MenuItem>
+                    </Menu>
+                </Sidebar>
+            </div>);
     }
 }
 

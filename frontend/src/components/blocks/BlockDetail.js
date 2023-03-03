@@ -1,9 +1,9 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import axios from "axios";
-import {toastOnError} from "../../utils/Utils";
-import {Breadcrumb, ListGroup, Spinner} from "react-bootstrap";
+import { toastOnError } from "../../utils/Utils";
+import { Breadcrumb, ListGroup, Spinner } from "react-bootstrap";
 import ReactDiffViewer from 'react-diff-viewer';
-import {withRouter} from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 
 class BlockDetail extends Component {
@@ -11,7 +11,9 @@ class BlockDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isActive: false, compareData: null, changedContent: false
+            isActive: false,
+            compareData: null,
+            changedContent: false
         };
 
         this.goBack = this.goBack.bind(this);
@@ -29,11 +31,12 @@ class BlockDetail extends Component {
     }
 
     componentDidMount() {
-        const {id} = this.props.match.params;
+        const { id } = this.props.match.params;
 
         axios.get(`/blocks/${id}/`).then(block => {
             this.setState({
-                block: block.data, isActive: true,
+                block: block.data,
+                isActive: true,
             })
         }).catch(error => {
             toastOnError(error);
@@ -68,43 +71,42 @@ class BlockDetail extends Component {
 
         if (this.state.block.results.length > 0) {
             results = this.state.block.results.map((result, i) => {
-                    if (this.state.changedContent === false && i === (this.state.block.results.length - 1)) {
-                        return (<ListGroup.Item as="li" active key={result.id} onClick={(event) => {
+                if (this.state.changedContent === false && i === (this.state.block.results.length - 1)) {
+                    return (<ListGroup.Item as="li" active key={result.id} onClick={(event) => {
                             event.preventDefault();
                             this.changeCompareData(result)
                         }}>
                             {result.created_at}
                         </ListGroup.Item>);
-                    } else if (!this.state.changedContent) {
-                        return (<ListGroup.Item as="li" key={result.id} onClick={(event) => {
+                } else if (!this.state.changedContent) {
+                    return (<ListGroup.Item as="li" key={result.id} onClick={(event) => {
                             event.preventDefault();
                             this.changeCompareData(result)
                         }}>
                             {result.created_at}
                         </ListGroup.Item>);
-                    }
-
-                    if (this.state.changedContent) {
-                        if (this.state.changedContent.id === result.id) {
-                            return (<ListGroup.Item as="li" active key={result.id} onClick={(event) => {
-                                event.preventDefault();
-                                this.changeCompareData(result)
-                            }}>
-                                {result.created_at}
-                            </ListGroup.Item>);
-                        } else {
-                            return (<ListGroup.Item as="li" key={result.id} onClick={(event) => {
-                                event.preventDefault();
-                                this.changeCompareData(result)
-                            }}>
-                                {result.created_at}
-                            </ListGroup.Item>);
-                        }
-                    } else {
-                        return ('');
-                    }
                 }
-            );
+
+                if (this.state.changedContent) {
+                    if (this.state.changedContent.id === result.id) {
+                        return (<ListGroup.Item as="li" active key={result.id} onClick={(event) => {
+                                event.preventDefault();
+                                this.changeCompareData(result)
+                            }}>
+                                {result.created_at}
+                            </ListGroup.Item>);
+                    } else {
+                        return (<ListGroup.Item as="li" key={result.id} onClick={(event) => {
+                                event.preventDefault();
+                                this.changeCompareData(result)
+                            }}>
+                                {result.created_at}
+                            </ListGroup.Item>);
+                    }
+                } else {
+                    return ('');
+                }
+            });
         }
 
         let newValue;
@@ -121,60 +123,58 @@ class BlockDetail extends Component {
             status = this.getStatus(this.state.changedContent.status)
             newValue = this.state.changedContent
         }
-        return (<div className="container">
-            <div className="row">
-                <div className="col-md-2">
+        return (
+            <div className="container">
+                <div className="row">
+                    <div className="col-md-6 mt-5">
+                        <Breadcrumb>
+                            <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>
+                            <Breadcrumb.Item onClick={this.goBackTwoPages}>Website details</Breadcrumb.Item>
+                            <Breadcrumb.Item onClick={this.goBack}>Page details</Breadcrumb.Item>
+                            <Breadcrumb.Item active>Block details</Breadcrumb.Item>
+                        </Breadcrumb>
+                    </div>
                 </div>
-                <div className="col-md-6 mt-5">
-                    <Breadcrumb>
-                        <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>
-                        <Breadcrumb.Item onClick={this.goBackTwoPages}>Website details</Breadcrumb.Item>
-                        <Breadcrumb.Item onClick={this.goBack}>Page details</Breadcrumb.Item>
-                        <Breadcrumb.Item active>Block details</Breadcrumb.Item>
-                    </Breadcrumb>
-                </div>
+                <div className="display-card"> 
+                    <div className="row">
+                    <div className="col-md-6">
+                        <div>
+                            <h2>History</h2>
+                            <ListGroup as="ul">
+                                {results}
+                            </ListGroup>
+
+                        </div>
+
+                    </div>
+                    <div className="col-md-6">
+                        <h1>Block information</h1>
+                        <p>
+                            Some basic information about the current block <br/>
+                            this includes the name, type of the block and the content inside it
+                        </p>
+                        <div className="form-group">
+                            <label htmlFor="name">Name:</label>
+                            <input type="name" className="form-control" readOnly={true} id="name"
+                                   value={this.state.block.name}/>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="type">Type:</label>
+                            <input type="type" className="form-control" readOnly={true} id="type"
+                                   value={this.state.block.type}/>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="type">Latest status:</label>
+                            <input type="type" className="form-control" readOnly={true} id="status"
+                                   value={status}/>
+                        </div>
+                    </div>
+                    </div>
             </div>
             <div className="row">
-                <div className="col-md-2">
-                </div>
-                <div className="col-md-4 mt-5">
-                    <div>
-                        <h2>History</h2>
-                        <ListGroup as="ul">
-                            {results}
-                        </ListGroup>
-
-                    </div>
-
-                </div>
-                <div className="col-md-6 mt-5">
-                    <h1>Block information</h1>
-                    <p>
-                        Some basic information about the current block <br/>
-                        this includes the name, type of the block and the content inside it
-                    </p>
-                    <div className="form-group">
-                        <label htmlFor="name">Name:</label>
-                        <input type="name" className="form-control" readOnly={true} id="name"
-                               value={this.state.block.name}/>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="type">Type:</label>
-                        <input type="type" className="form-control" readOnly={true} id="type"
-                               value={this.state.block.type}/>
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="type">Latest status:</label>
-                        <input type="type" className="form-control" readOnly={true} id="status"
-                               value={status}/>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-md-2">
-                </div>
-                <div className="col-md-10 mt-5">
+                <div className="col-md-12 mt-5">
+                    <div className="display-card">
                     <ReactDiffViewer oldValue={this.state.block.content[0].content}
                                      newValue={status === 'Nothing changed' ? this.state.block.content[0].content : newValue.data.content}
                                      splitView={true}
@@ -184,6 +184,7 @@ class BlockDetail extends Component {
                                      leftTitle={"Saved data"}
                                      rightTitle={"Live data"}
                     />
+                    </div>
                 </div>
             </div>
         </div>);
@@ -192,4 +193,3 @@ class BlockDetail extends Component {
 
 
 export default withRouter(BlockDetail);
-

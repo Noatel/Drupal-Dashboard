@@ -92,9 +92,11 @@ class ChecklistSerializer(serializers.ModelSerializer):
 
 
 class WebsiteSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    
     class Meta:
         model = Website
-        fields = ['id', 'name', 'description', 'url', 'image', ]
+        fields = ['id', 'name', 'description', 'url', 'image', 'created_at']
 
 
 class WebsiteWithChecklistSerializer(serializers.ModelSerializer):

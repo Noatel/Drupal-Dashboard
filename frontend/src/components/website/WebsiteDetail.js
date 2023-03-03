@@ -1,9 +1,9 @@
-import React, {Component} from "react";
-import {Link} from "react-router-dom";
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import {Breadcrumb, Button, Spinner, Pagination} from "react-bootstrap";
+import { Breadcrumb, Button, Spinner, Pagination } from "react-bootstrap";
 import axios from "axios";
-import {toastOnError} from "../../utils/Utils";
+import { toastOnError } from "../../utils/Utils";
 import {
     AiFillEye,
     AiOutlineArrowDown,
@@ -12,8 +12,8 @@ import {
     AiOutlineWarning,
     MdOutlineDone
 } from "react-icons/all";
-import {IconContext} from "react-icons";
-import {toast} from "react-toastify";
+import { IconContext } from "react-icons";
+import { toast } from "react-toastify";
 
 class WebsiteDetail extends Component {
     constructor(props) {
@@ -32,7 +32,7 @@ class WebsiteDetail extends Component {
     }
 
     componentDidMount() {
-        const {id} = this.props.match.params;
+        const { id } = this.props.match.params;
 
         axios.get(`/websites/${id}`).then(response => {
             this.setState({
@@ -97,11 +97,11 @@ class WebsiteDetail extends Component {
                     isActive: true,
                 })
             }).catch(error => {
-            toastOnError(error);
-        });
+                toastOnError(error);
+            });
     }
     orderPages = () => {
-        const {id} = this.props.match.params;
+        const { id } = this.props.match.params;
         let order = !this.state.order;
         this.setState({
             order: order,
@@ -149,8 +149,7 @@ class WebsiteDetail extends Component {
                         <h2>No pages available</h2>
                     </div>
                 </div>
-            )
-                ;
+            );
         }
 
         if (Object.keys(this.state.pages).length === 0) {
@@ -201,32 +200,35 @@ class WebsiteDetail extends Component {
         });
 
         return (
-            <div>
-                <div className="container">
-                    <div>
+            <div className="container">
                         <div className="row">
-                            <div className="col-md-2">
+                            <div className="col-md-12 mt-5">
+                                 <Breadcrumb>
+                                        <Breadcrumb.Item onClick={this.props.history.goBack}>Clients</Breadcrumb.Item>
+                                        <Breadcrumb.Item active>Website details</Breadcrumb.Item>
+                                    </Breadcrumb>
                             </div>
-                            <div className="col-md-6 mt-5">
-                                <Breadcrumb>
-                                    <Breadcrumb.Item onClick={this.props.history.goBack}>Clients</Breadcrumb.Item>
-                                    <Breadcrumb.Item active>Website details</Breadcrumb.Item>
-                                </Breadcrumb>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <h2>Website - Details</h2>
+                                <div className="display-card"> 
 
-                                <h1>{this.state.website.name}</h1>
-                                <p>{this.state.website.description}</p>
-                            </div>
+                                    <h3>{this.state.website.name}</h3>
+                                    <p>{this.state.website.description}</p>
+                                </div>
                             <div className="col-md-4 mt-5">
                                 <img className="logo" src={this.state.website.image} alt=""/>
                             </div>
                         </div>
+                        </div>
                         <div className="row">
-                            <div className="col-md-2">
-                            </div>
+                        <div className="col-md-12"> 
+                  
+                        {/*<h2>Website - Pages </h2>*/}
+                        <div className="display-card">
 
-                            <div className="col-md-10 mt-5">
-                                <h2 className="d-inline-block">Pages:</h2>
-                                <div className="d-inline-block ml-5">
+                                <div className="d-inline-block">
                                     <Pagination>
                                         <Pagination.First disabled={this.state.pageNumber === 1} value={1}
                                                           onClick={() => this.toPage(1)}/>
@@ -280,9 +282,6 @@ class WebsiteDetail extends Component {
                                 >
                                     Schedule a test
                                 </Button>
-
-                                <div className="row">
-                                    <div className="col-md-12">
                                         <Table striped bordered hover>
                                             <thead>
                                             <tr>
@@ -298,18 +297,13 @@ class WebsiteDetail extends Component {
                                             {items}
                                             </tbody>
                                         </Table>
-                                    </div>
-                                </div>
                             </div>
                             <hr/>
                         </div>
                     </div>
                 </div>
-            </div>
-        )
-            ;
+        );
     }
 }
 
 export default WebsiteDetail;
-

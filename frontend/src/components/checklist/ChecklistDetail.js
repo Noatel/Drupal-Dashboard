@@ -88,8 +88,6 @@ class ChecklistDetail extends Component {
 
             <div className="container">
                 <div className="row">
-                    <div className="col-md-2">
-                    </div>
                     <div className="col-md-6 mt-5">
                         <Breadcrumb>
                             <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>
@@ -98,11 +96,9 @@ class ChecklistDetail extends Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-2">
-                    </div>
-                    <div className="col-md-10 mt-5">
-                        <div>
+                    <div className="col-md-12 mt-5">
                             <h2>Checklist</h2>
+                        <div className="display-card">
 
                             <Button
                                 className="float-right button-checklist"

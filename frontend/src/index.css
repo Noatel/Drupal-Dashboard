@@ -1,13 +1,43 @@
-.sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    min-height: 100vh !important;
-    z-index: 1;
-    padding: 48px 0 0;
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+@font-face {
+font-family: "Inter";
+src: local("Inter"), url("/public/fonts/Inter-Medium.ttf") format("truetype");
+}
 
+body {
+    margin: 0;
+    font-family: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* additions here*/
+    height: 100vh;
+    background-color: #f8f9fb;
+}
+
+h2,h3,h1{
+   font-family: 'Inter', sans-serif;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+        monospace;
+}
+
+.sidebar {
+    background-color: whitesmoke;
+    position:fixed;
+}
+
+.sidebar-header {
+    font-weight: bold;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.sidebar-item>a>span {
+    color: black;
+    text-decoration: none;
 }
 
 #sidebar-wrapper {
@@ -20,9 +50,7 @@
     transition: margin .25s ease-out;
 }
 
-#sidebar-wrapper .sidebar-heading {
-
-}
+#sidebar-wrapper .sidebar-heading {}
 
 #page-content-wrapper {
     min-width: 0;
@@ -46,6 +74,7 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -59,10 +88,11 @@
     margin-top: 100px;
 }
 
-.spinner-div {
+.spinner-div>div {
     justify-content: center;
     display: flex;
-
+    position: fixed;
+    left: 50%;
 }
 
 .spinner {
@@ -76,7 +106,7 @@
     pointer-events: none;
 }
 
-.disable-link > svg {
+.disable-link>svg {
     color: gray
 }
 
@@ -86,12 +116,16 @@
     /*border-color: #069C56 !important;*/
 }
 
-.green > td, .red > td, .orange > td {
+.green>td,
+.red>td,
+.orange>td {
     border: 0 !important;
 }
 
 .white,
-.green > td > a, .red > td > a, .orange > td > a {
+.green>td>a,
+.red>td>a,
+.orange>td>a {
     color: white !important;
 }
 
@@ -107,19 +141,13 @@
     border-color: #D3212C !important;
 }
 
-.thead-page {
-    background-color: #f8f9fa !important;
-}
-
 .logo {
     border: 1px solid black;
     float: right;
 }
 
 .breadcrumb {
-    background-color: white !important;
-    padding-left: 0px !important;
-
+ background-color: #f8f9fb !important;
 }
 
 .tableData {
@@ -133,22 +161,41 @@
     vertical-align: middle;
 }
 
-.tableBlock > td > p , .tableBlock > th {
-    margin-left:5px;
+.tableBlock>td>p,
+.tableBlock>th {
+    margin-left: 5px;
 }
-.button-checklist{
+
+.button-checklist {
     position: relative;
-    bottom: 50px;
+    bottom: 10px;
 }
-.statusIcon{
-    margin-top:5px;
+
+.statusIcon {
+    margin-top: 5px;
     display: inline-block;
-    margin-right:10px;
+    margin-right: 10px;
 }
-.accordian-drop{
-        margin-top:5px;
-        float:right;
+
+.accordian-drop {
+    margin-top: 5px;
+    float: right;
 }
-.text-center{
+
+.text-center {
     text-align: center !important;
+}
+
+.display-card {
+    border: 1px solid rgba(249, 249, 249, 0.7);
+    background-color: white;
+    border-radius: 20px;
+    padding: 25px;
+    width: 100%;
+    box-shadow: 0 1px 1px 0 rgb(118 135 154 / 24%), 0 3px 8px 0 rgb(118 135 154 / 8%);
+}
+
+.thead-page {
+    border-color:transparent !important;
+
 }
