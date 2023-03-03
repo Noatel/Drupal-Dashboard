@@ -54,7 +54,7 @@ class Page extends Component {
         axios.get(`/results/?page_id=${id}`).then(response => {
 
             this.setState({
-                results: response.data.results,
+                results: response.data,
                 isActive: true
             })
 
@@ -250,6 +250,8 @@ class Page extends Component {
                 } else if (result.attribute === 'meta') {
                     metaTitle = result.page_value.value[0];
                     metaDescription = result.page_value.value[1];
+                    descriptionColor = metaDescription.length > 0 ? 'green' : 'red'
+                    titleColor = metaTitle.length > 0 ? 'green' : 'red'
                 }
             });
 
@@ -257,8 +259,6 @@ class Page extends Component {
             statusId = resultsIds.length > 0 ? 'red' : 'green'
             statusAlt = resultsAlts.length > 0 ? 'red' : 'green'
             statusOrders = resultsOrders.length > 0 ? 'red' : 'green'
-            descriptionColor = metaDescription.length > 0 ? 'green' : 'red'
-            titleColor = metaTitle.length > 0 ? 'green' : 'red'
 
 
             resultsHeaders = resultsHeaders.map(result => {

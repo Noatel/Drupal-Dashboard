@@ -189,13 +189,24 @@ class CheckPageSpider(scrapy.Spider):
 
     def check_meta(self, response):
         title = response.xpath("//title/text()").extract()
+        meta_description = response.xpath("//meta[@name='description']/@content").extract()
+        check_description = len(meta_description) > 0
         check_title = title == ""
 
-        meta_description = response.xpath("//meta[@name='description']/@content").extract()
-        title = response.xpath("//title/text()").extract()
+        if check_title:
+            self.check_title = check_title
+            self.titles.append(self.start_url)
+        if meta_description:
+            meta_description = meta_description[0]
+        else:
+            if check_description:
+                self.check_description = check_description
+                self.descriptions.append(self.start_url)
 
         page = self.urls[self.url_position]
 
+        print(page.url)
+        print(title, meta_description)
         # Just save always the metadata for the customer to see
 
         page_value, created = PageValue.objects.update_or_create(

@@ -37,7 +37,7 @@ class Login extends Component {
                         <h1>Login</h1>
                         <Form>
                             <Form.Group controlId="emailId">
-                                <Form.Label>Your Email</Form.Label>
+                                <Form.Label>Email</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="email"
@@ -48,7 +48,7 @@ class Login extends Component {
                             </Form.Group>
 
                             <Form.Group controlId="passwordId">
-                                <Form.Label>Your password</Form.Label>
+                                <Form.Label>Password</Form.Label>
                                 <Form.Control
                                     type="password"
                                     name="password"

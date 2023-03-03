@@ -4,7 +4,14 @@ import Table from "react-bootstrap/Table";
 import {Breadcrumb, Button, Spinner, Pagination} from "react-bootstrap";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {AiFillEye, AiOutlineLink, AiOutlineWarning, MdOutlineDone} from "react-icons/all";
+import {
+    AiFillEye,
+    AiOutlineArrowDown,
+    AiOutlineArrowUp,
+    AiOutlineLink,
+    AiOutlineWarning,
+    MdOutlineDone
+} from "react-icons/all";
 import {IconContext} from "react-icons";
 import {toast} from "react-toastify";
 
@@ -17,9 +24,11 @@ class WebsiteDetail extends Component {
             isActive: false,
             pageNumber: 1,
             maxLength: 0,
+            order: false,
         }
 
         this.toPage = this.toPage.bind(this);
+        this.orderPages = this.orderPages.bind(this);
     }
 
     componentDidMount() {
@@ -91,6 +100,24 @@ class WebsiteDetail extends Component {
             toastOnError(error);
         });
     }
+    orderPages = () => {
+        const {id} = this.props.match.params;
+        let order = !this.state.order;
+        this.setState({
+            order: order,
+        })
+        axios.get(`/pages/?website_id=${id}&order=` + order).then(response => {
+            this.setState({
+                maxLength: response.data.count,
+                pages: response.data.results,
+                isActive: true,
+            })
+        }).catch(error => {
+            toastOnError(error);
+        });
+
+    }
+
 
     toPage = (value) => {
         this.setState({
@@ -102,7 +129,6 @@ class WebsiteDetail extends Component {
 
 
     render() {
-
         if (!this.state.isActive) {
             return (
                 <div className="spinner-div">
@@ -149,7 +175,7 @@ class WebsiteDetail extends Component {
                     <td><p
                         style={{textTransform: 'capitalize'}}>{page.name ? page.name.split('-').join(' ') : "None"}  </p>
                     </td>
-                    {page.page_results > 0 ?
+                    {page.page_results > 1 ?
                         <td className="align-middle text-center"><IconContext.Provider
                             value={{color: 'red', textAlign: "center"}}>
                             <AiOutlineWarning/>
@@ -209,18 +235,32 @@ class WebsiteDetail extends Component {
                                                          onClick={() => this.toPage(this.state.pageNumber - 1)}/>
                                         <Pagination.Item value={this.state.pageNumber}
                                                          onClick={() => this.toPage(this.state.pageNumber)}>{this.state.pageNumber}</Pagination.Item>
-                                        <Pagination.Item value={this.state.pageNumber + 1}
-                                                         onClick={() => this.toPage(this.state.pageNumber + 1)}>{this.state.pageNumber + 1}</Pagination.Item>
-                                        <Pagination.Item value={this.state.pageNumber + 2}
-                                                         onClick={() => this.toPage(this.state.pageNumber + 2)}>{this.state.pageNumber + 2}</Pagination.Item>
-                                        <Pagination.Item value={this.state.pageNumber + 3}
-                                                         onClick={() => this.toPage(this.state.pageNumber + 3)}>{this.state.pageNumber + 3}</Pagination.Item>
-                                        <Pagination.Item value={this.state.pageNumber + 4}
-                                                         onClick={() => this.toPage(this.state.pageNumber + 4)}>{this.state.pageNumber + 4}</Pagination.Item>
 
-                                        <Pagination.Ellipsis/>
-                                        <Pagination.Item value={this.state.maxLength}
-                                                         onClick={() => this.toPage(Math.ceil((this.state.maxLength / 25)))}> {Math.ceil((this.state.maxLength / 25))}</Pagination.Item>
+                                        {(this.state.pageNumber + 1) > Math.ceil((this.state.maxLength / 25)) ?
+                                            <Pagination.Item value={this.state.pageNumber + 1}
+                                                             disabled>{this.state.pageNumber + 1}</Pagination.Item> :
+                                            <Pagination.Item value={this.state.pageNumber + 1}
+                                                             onClick={() => this.toPage(this.state.pageNumber + 1)}>{this.state.pageNumber + 1}</Pagination.Item>}
+                                        {(this.state.pageNumber + 2) > Math.ceil((this.state.maxLength / 25)) ?
+                                            <Pagination.Item value={this.state.pageNumber + 2}
+                                                             disabled>{this.state.pageNumber + 2}</Pagination.Item> :
+                                            <Pagination.Item value={this.state.pageNumber + 2}
+                                                             onClick={() => this.toPage(this.state.pageNumber + 2)}>{this.state.pageNumber + 2}</Pagination.Item>}
+                                        {(this.state.pageNumber + 3) > Math.ceil((this.state.maxLength / 25)) ?
+                                            <Pagination.Item value={this.state.pageNumber + 3}
+                                                             disabled>{this.state.pageNumber + 3}</Pagination.Item> :
+                                            <Pagination.Item value={this.state.pageNumber + 3}
+                                                             onClick={() => this.toPage(this.state.pageNumber + 3)}>{this.state.pageNumber + 3}</Pagination.Item>}
+                                        {(this.state.pageNumber + 4) > Math.ceil((this.state.maxLength / 25)) ?
+                                            <Pagination.Item value={this.state.pageNumber + 4}
+                                                             disabled>{this.state.pageNumber + 4}</Pagination.Item> :
+                                            <Pagination.Item value={this.state.pageNumber + 4}
+                                                             onClick={() => this.toPage(this.state.pageNumber + 4)}>{this.state.pageNumber + 4}</Pagination.Item>}
+
+                                        {5 > Math.ceil((this.state.maxLength / 25)) ? "" :
+                                            <Pagination.Ellipsis/>}
+                                        {/*<Pagination.Item value={this.state.maxLength}*/}
+                                        {/*                 onClick={() => this.toPage(Math.ceil((this.state.maxLength / 25)))}> {Math.ceil((this.state.maxLength / 25))}</Pagination.Item>*/}
                                         <Pagination.Next
                                             disabled={this.state.pageNumber === Math.ceil((this.state.maxLength / 25))}
                                             value={this.state.pageNumber + 1}
@@ -247,7 +287,9 @@ class WebsiteDetail extends Component {
                                             <thead>
                                             <tr>
                                                 <th>Name</th>
-                                                <th>Problems</th>
+                                                {this.state.order ?
+                                                    <th>Problems <AiOutlineArrowDown onClick={this.orderPages}/></th> :
+                                                    <th>Problems <AiOutlineArrowUp onClick={this.orderPages}/></th>}
                                                 <th>URL</th>
                                                 <th>View</th>
                                             </tr>

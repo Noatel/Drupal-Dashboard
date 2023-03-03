@@ -1,3 +1,4 @@
+from django_filters.rest_framework import filters, DjangoFilterBackend
 from rest_framework import serializers
 from src.api.models import Website, Page, Block, Content, Result, Task, Checklist, PageResult, PageValue
 
@@ -59,7 +60,7 @@ class PageResultsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PageResult
-        fields = ['id', 'attribute', 'className','page_value']
+        fields = ['id', 'attribute', 'className', 'page_value']
 
 
 class ResultsSerializer(serializers.ModelSerializer):
@@ -93,7 +94,7 @@ class ChecklistSerializer(serializers.ModelSerializer):
 class WebsiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Website
-        fields = ['id', 'name', 'description', 'url', 'image',]
+        fields = ['id', 'name', 'description', 'url', 'image', ]
 
 
 class WebsiteWithChecklistSerializer(serializers.ModelSerializer):
@@ -101,7 +102,8 @@ class WebsiteWithChecklistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Website
-        fields = ['id', 'name','checklist']
+        fields = ['id', 'name', 'checklist']
+
 
 class WebsiteWithPagesSerializer(serializers.ModelSerializer):
     pages = WebPageSerializer(many=True)
@@ -115,12 +117,12 @@ class WebsiteWithPagesSerializer(serializers.ModelSerializer):
 class PageWithResultsSerializer(serializers.ModelSerializer):
     # page_results = PageResultsSerializer(many=True)
     page_results = serializers.SerializerMethodField()
+    num_related = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Page
-        fields = ['id', 'url', 'name', 'page_results']
+        fields = ['id', 'url', 'name', 'page_results','num_related']
 
     def get_page_results(self, obj):
         count = obj.page_results.count()
         return count
-

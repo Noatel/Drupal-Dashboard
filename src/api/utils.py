@@ -54,8 +54,8 @@ def scan_page_test(websiteId: uuid.UUID):
         :param website: Give the components you want to get the sitemap from
     """
 
-    website = Website.objects.filter(websiteId=websiteId).first()
-    pages = website.pages.filter(websiteId=websiteId).distinct('url')
+    website = Website.objects.filter(id=websiteId).first()
+    pages = website.pages.distinct('url')
 
     if pages:
         run_spider(CheckPageSpider, urls=pages)
@@ -147,15 +147,16 @@ def schedule_website(websiteId: uuid.UUID):
     website = Website.objects.filter(id=websiteId).first()
 
     # Get the sitemap
-    schedule, created = Scan.objects.get_or_create(
+    scan, created = Scan.objects.get_or_create(
         website=website
     )
 
-    # schedule it
-    schedule.status = Scan.STATUS[0]
-    schedule.save()
+    scan.completed_at = None
+    scan.status = Scan.STATUS.SITEMAP
+    scan.started_at = datetime.now()
+    scan.save(update_fields=['completed_at', 'started_at', 'status'])
 
-    return schedule
+    return scan
 
 
 def schedule_checklist(websiteId: uuid.UUID):

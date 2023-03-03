@@ -1,6 +1,7 @@
 from django.db.models import Count
 from django.http import JsonResponse
-from rest_framework import viewsets, status, pagination, mixins
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, status, pagination, mixins, filters
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
@@ -64,7 +65,7 @@ class WebsiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
         schedule = schedule_checklist(websiteId=pk)
         return Response(data='Scheduled', status=status.HTTP_201_CREATED, content_type="application/json")
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, url_name='schedule', url_path='schedule')
     def schedule(self, request, pk):
         """
         Schedule a task in based on website id
@@ -83,10 +84,35 @@ class PageViewSet(viewsets.ModelViewSet):
         page_size_query_param = 'page_size'
         max_page_size = 1000
 
-    queryset = Page.objects.all().order_by('name')
+    queryset = Page.objects.all()
     serializer_class = PageWithResultsSerializer
     pagination_class = StandardResultsSetPagination
     paginator = PageNumberPagination()
+
+    def list(self, request, *args, **kwargs):
+
+        if self.request.GET.get('website_id'):
+            pk = self.request.GET.get('website_id')
+            print(pk)
+
+            queryset = Page.objects.filter(website__id=pk)
+        else:
+            queryset = super().get_queryset()
+        if self.request.GET.get('order'):
+            queryset = queryset.annotate(num_related=Count('page_results'))
+
+            if self.request.GET.get('order') == 'true':
+                queryset = queryset.order_by("-num_related")
+            else:
+                queryset = queryset.order_by("num_related")
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(methods=['get'], detail=True, url_name='results', url_path='results')
     def results(self, request, pk):
@@ -100,7 +126,6 @@ class PageViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return Response(data='No website_id provided', status=status.HTTP_201_CREATED, content_type="application/json")
-
 
     @action(methods=['get'], detail=True, url_name='blocks', url_path='blocks')
     def results(self, request, pk):
@@ -151,12 +176,6 @@ class BlockViewSet(viewsets.ModelViewSet):
         return self.queryset.filter()
 
 
-class UnlimtedSetPagination(PageNumberPagination):
-    page_size = 1000
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
-
 class ResultViewSet(viewsets.ModelViewSet):
     """
        API endpoint that allows components to create
@@ -164,8 +183,7 @@ class ResultViewSet(viewsets.ModelViewSet):
 
     queryset = PageResult.objects.all()
     serializer_class = PageResultsSerializer
-    pagination_class = UnlimtedSetPagination
-    paginator = PageNumberPagination()
+    paginator = None
 
     def get_queryset(self):
         # Return all pages with from a website

@@ -35,6 +35,7 @@ class BlockDetail extends Component {
             this.setState({
                 block: block.data, isActive: true,
             })
+            console.warn(this.state.block);
         }).catch(error => {
             toastOnError(error);
         });
@@ -44,6 +45,7 @@ class BlockDetail extends Component {
         this.setState({
             changedContent: result
         })
+        console.warn(result)
     }
 
     getStatus(status) {
@@ -119,7 +121,9 @@ class BlockDetail extends Component {
 
         if (this.state.changedContent) {
             status = this.getStatus(this.state.changedContent.status)
+            newValue = this.state.changedContent
         }
+        console.warn(status)
         return (<div className="container">
             <div className="row">
                 <div className="col-md-2">
@@ -175,7 +179,7 @@ class BlockDetail extends Component {
                 </div>
                 <div className="col-md-10 mt-5">
                     <ReactDiffViewer oldValue={this.state.block.content[0].content}
-                                     newValue={newValue.data.content}
+                                     newValue={status === 'Nothing changed' ? this.state.block.content[0].content : newValue.data.content}
                                      splitView={true}
                                      compareMethod={'diffWords'}
                                      showDiffOnly={true}

@@ -10,9 +10,8 @@ from src.api.utils import schedule_website, check_live_blocks, check_all, activa
 @shared_task(name='schedule all websites')
 def schedule_all_websites():
     websites = Website.objects.all()
-
     for website in websites:
-        schedule_website(website.id).delay()
+        schedule_website(websiteId=website.id).delay()
 
 
 @shared_task(name='check_for_scans')
@@ -48,10 +47,11 @@ def check_for_checklist():
 
 @shared_task(name='run_page_scan')
 def run_page_scan():
-    """Check for tasks that haven't completed yet """
-    checklists = Checklist.objects.filter(~Q(status=6))
-    for checklist in checklists:
-        scan_page_test(websiteId=checklist.website_id)
+    # TODO: ONLY SPECIFC PAGES NOT ALL
+    websites = Website.objects.all()
+    for website in websites:
+
+        scan_page_test(websiteId=website.id)
 
 
 @shared_task(name='reset_status_for_scans')

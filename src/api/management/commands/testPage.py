@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
         if db_website:
             # activate_test(scanId='33b4d29f-34ee-46e8-9454-7a1d3217280b')
-            scan_page_test(website=db_website)
+            scan_page_test(websiteId=db_website.id)
 
 
 

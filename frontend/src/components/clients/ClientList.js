@@ -10,7 +10,7 @@ class ClientsList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            websites: {},
+            websites: [],
             isActive: false,
         };
     }
