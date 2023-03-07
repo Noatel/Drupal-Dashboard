@@ -15,8 +15,8 @@ class Command(BaseCommand):
         db_website = Website.objects.filter(url=website).first()
 
         if db_website:
-            # activate_test(scanId='33b4d29f-34ee-46e8-9454-7a1d3217280b')
-            scan_page_test(websiteId=db_website.id)
+            activate_test(scanId='b4506cbb-913f-46d3-9a6b-69e004f614ce')
+            # scan_page_test(websiteId=db_website.id)
 
 
 

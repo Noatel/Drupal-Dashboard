@@ -21,8 +21,6 @@ class ContentSpider(scrapy.Spider):
         self.url_position = 0
         self.urls = urls
         self.testing = False
-        page = Page.objects.filter(url=urls[0].url).first()
-        self.website = page.website
 
     def parse(self, response, **kwargs):
         page = self.urls[self.url_position]
@@ -59,13 +57,13 @@ class ContentSpider(scrapy.Spider):
             self.url_position += 1
             try:
                 url = response.urljoin(self.urls[self.url_position].url)
-                yield scrapy.Request(url, callback=self.parse)
+                yield scrapy.Request(url, callback=self.parse, dont_filter = True)
             except IndexError:
                 pass
         else:
             # if there are no pages to look for anymore,
             # Get scan and set the scan to the next step
-            scan = Scan.objects.filter(website_id=self.website.id).first()
+            scan = Scan.objects.filter(website_id=page.website.id).first()
             scan.status = Scan.STATUS.COMPARE_BLOCKS
             scan.save()
 

@@ -19,6 +19,7 @@ import Root from "./Root";
 import BlockDetail from "./components/blocks/BlockDetail";
 import ClientsList from "./components/clients/ClientList";
 import ChecklistDetail from "./components/checklist/ChecklistDetail";
+import SettingsList from "./components/settings/SettingsList";
 
 
 export const baseURL = process.env.REACT_APP_API_URL;
@@ -30,7 +31,7 @@ class App extends Component {
         return (
             <div id="app" style={({height: "100vh"}, {display: "flex"})}>
                 <Root>
-                
+
                     <SideBar/>
 
                     <ToastContainer hideProgressBar={true} newestOnTop={true}/>
@@ -56,6 +57,9 @@ class App extends Component {
 
                     <Route exact path="/clients" component={ClientsList}/>
                     <Route exact path="/clients/website/:id" component={ChecklistDetail}/>
+
+                    <Route exact path="/settings" component={SettingsList}/>
+
                 </Root>
             </div>
 

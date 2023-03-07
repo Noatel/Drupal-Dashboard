@@ -1,14 +1,16 @@
 import logging
+from datetime import timedelta
+from math import ceil
 
 import scrapy
-from src.api.models import PageResult, PageValue
+import time
+from src.api.models import PageResult, PageValue, PageSpeed
 
 
 class CheckPageSpider(scrapy.Spider):
     name = 'Content spider'
 
     def __init__(self, *args, **kwargs):
-
         # Disable the logging (Not needed)
         logging.getLogger('scrapy').propagate = False
 
@@ -35,6 +37,7 @@ class CheckPageSpider(scrapy.Spider):
         check_images = self.check_images(response=response)
         check_order = self.check_order(response=response)
         check_meta = self.check_meta(response=response)
+        get_page_speed = self.get_page_speed(response=response)
 
         # Now for the next page on the components,
         # check if the position is equal to the amount of pages, and check if it's not empty
@@ -48,6 +51,23 @@ class CheckPageSpider(scrapy.Spider):
                 yield scrapy.Request(url, callback=self.parse)
             except IndexError:
                 pass
+
+    def get_page_speed(self, response):
+        # response_time = time.time() - response.request.meta
+        page = self.urls[self.url_position]
+
+        seconds = response.meta['download_latency']
+
+        value = timedelta(seconds=seconds)
+        amount = round(value.total_seconds(), 2)
+
+        pagespeed, created = PageSpeed.objects.get_or_create(
+            amount=amount,
+            page=page,
+            type=PageSpeed.TYPE.PAGE_TEST,
+        )
+
+
 
     def check_headers(self, response):
         """
@@ -205,10 +225,7 @@ class CheckPageSpider(scrapy.Spider):
 
         page = self.urls[self.url_position]
 
-        print(page.url)
-        print(title, meta_description)
         # Just save always the metadata for the customer to see
-
         page_value, created = PageValue.objects.update_or_create(
             value=[title, meta_description],
         )

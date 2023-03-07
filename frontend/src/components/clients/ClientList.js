@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import axios from "axios";
-import { toastOnError } from "../../utils/Utils";
+import {toastOnError} from "../../utils/Utils";
 import Table from "react-bootstrap/Table";
-import { AiFillEye, AiFillSetting, GoChecklist } from "react-icons/all";
-import { Link } from "react-router-dom";
-import { Spinner } from "react-bootstrap";
+import {AiFillEye, AiFillSetting, GoChecklist} from "react-icons/all";
+import {Link} from "react-router-dom";
+import {Spinner} from "react-bootstrap";
 
 class ClientsList extends Component {
     constructor(props) {
@@ -44,10 +44,14 @@ class ClientsList extends Component {
             let items = this.state.websites.map(website => {
                 return (
                     <tr key={website.id}>
-                        <td>{website.name}</td>
+                        <td>
+                            <Link to={"/website/" + website.id} key={website.id} className={''}>
+                                {website.name}
+                            </Link>
+                        </td>
                         <td><AiFillSetting/></td>
                         <td>
-                             <Link to={"/clients/website/" + website.id } key={website.id}>
+                            <Link to={"/clients/website/" + website.id} key={website.id}>
                                 <GoChecklist/>
                             </Link>
                         </td>
@@ -63,25 +67,26 @@ class ClientsList extends Component {
             return (
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-12 mt-5" style={{height: "90vh"}}> 
-                        <h1>Clients</h1>
-                        <div className="display-card">
-                            <div className="mt-5">
-                                <Table className={"display-card-"}>
-                                    <thead className="thead-page">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Settings</th>
-                                        <th>Checklist</th>
-                                        <th>View</th>
-                                        <th>Date added</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+                        <div className="col-md-12 mt-5" style={{height: "90vh"}}>
+                            <h1>Clients</h1>
+                            <div className="display-card">
+                                <div className="mt-5">
+                                    <Table className={"display-card-"}>
+                                        <thead className="thead-page">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Settings</th>
+                                            <th>Checklist</th>
+                                            <th>View</th>
+                                            <th>Date added</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {items}
-                                    </tbody>
-                                </Table>
-                            </div></div>
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

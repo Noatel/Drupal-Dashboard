@@ -1,6 +1,6 @@
 from django_filters.rest_framework import filters, DjangoFilterBackend
 from rest_framework import serializers
-from src.api.models import Website, Page, Block, Content, Result, Task, Checklist, PageResult, PageValue
+from src.api.models import Website, Page, Block, Content, Result, Task, Checklist, PageResult, PageValue, PageSpeed
 
 
 class ContentSerializer(serializers.ModelSerializer):
@@ -41,12 +41,21 @@ class BlockSerializerWithoutData(serializers.ModelSerializer):
         fields = ['id', 'name', 'type', 'content', 'results']
 
 
+class PageSpeedSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
+    class Meta:
+        model = PageSpeed
+        fields = ['created_at', 'amount']
+
+
 class PageSerializer(serializers.ModelSerializer):
     blocks = BlockSerializerWithoutData(many=True)
+    page_speed = PageSpeedSerializer(many=True)
 
     class Meta:
         model = Page
-        fields = ['id', 'name', 'url', 'blocks']
+        fields = ['id', 'name', 'url', 'blocks','page_speed']
 
 
 class PageResultsValueSerializer(serializers.ModelSerializer):
@@ -93,7 +102,7 @@ class ChecklistSerializer(serializers.ModelSerializer):
 
 class WebsiteSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
-    
+
     class Meta:
         model = Website
         fields = ['id', 'name', 'description', 'url', 'image', 'created_at']
@@ -117,13 +126,12 @@ class WebsiteWithPagesSerializer(serializers.ModelSerializer):
 
 
 class PageWithResultsSerializer(serializers.ModelSerializer):
-    # page_results = PageResultsSerializer(many=True)
     page_results = serializers.SerializerMethodField()
     num_related = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Page
-        fields = ['id', 'url', 'name', 'page_results','num_related']
+        fields = ['id', 'url', 'name', 'page_results', 'num_related']
 
     def get_page_results(self, obj):
         count = obj.page_results.count()

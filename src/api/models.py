@@ -47,13 +47,19 @@ class Page(models.Model):
 
 
 class PageSpeed(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    amount = models.CharField(max_length=50, null=False)
-    created_at = models.DateTimeField(default=django.utils.timezone.now)
-    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
+    TYPE = Choices(
+        (1, 'PAGE_TEST', _('Page test')),
+        (2, 'STRESS_TEST', _('Stress test')),
+    )
 
-    page = models.ForeignKey(Page, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, null=False, related_name='page_speed')
+
+    type = models.CharField(max_length=50, null=False, choices=TYPE)
+    v_users = models.IntegerField(max_length=50, null=True)
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
+
+    amount = models.DecimalField(max_digits=50, null=True, decimal_places=2)
 
     def __str__(self):
         return self.page.name
