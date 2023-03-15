@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'djoser',
     'django_celery_beat',
     'django_celery_results',
+    'anymail',
 ]
 
 MIDDLEWARE = [
@@ -237,3 +238,17 @@ TEST_OUTPUT_FILE_NAME = 'junit.xml'
 handle_httpstatus_all = True
 handle_httpstatus_list = [404]
 HTTPERROR_ALLOWED_CODES = [404]
+
+
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+
+if "anymail" in EMAIL_BACKEND:
+    ANYMAIL = {
+        "MAILGUN_API_KEY": os.getenv("MAILGUN_API_KEY", None),
+        "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_SENDER_DOMAIN", "https://api.eu.mailgun.net/v3"),
+        "MAILGUN_API_URL": "https://api.mailgun.net/v3"
+    }
+
+DEFAULT_FROM_EMAIL = "noahtelussa@gmail.com"
+TEMPLATED_EMAIL_FILE_EXTENSION = "html"
+SERVER_EMAIL = "noahtelussa@gmail.com"

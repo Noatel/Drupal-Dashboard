@@ -1,23 +1,26 @@
 import React, {Component} from "react";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {Breadcrumb, Button, ListGroup, Spinner} from "react-bootstrap";
+import {Button, Spinner} from "react-bootstrap";
 import {withRouter} from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import {BsCircleFill} from "react-icons/all";
+import {BsCircleFill} from "react-icons/bs";
 import {IconContext} from "react-icons";
 import {connect} from "react-redux";
 import {scheduleChecklist} from "../website/WebsiteActions";
 import PropTypes from "prop-types";
 
 
-class SettingsList extends Component {
+class ChecklistDetail extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
             website: null,
             isActive: false
         };
+
+
     }
 
     componentDidMount() {
@@ -82,55 +85,58 @@ class SettingsList extends Component {
             }
         }
         return (
-
-            <div className="container">
+            <div>
                 <div className="row">
-                    <div className="col-md-6 mt-5">
-                        <Breadcrumb>
-                            <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>
-                            <Breadcrumb.Item active>Checklist</Breadcrumb.Item>
-                        </Breadcrumb>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-12 mt-5">
-                            <h2>Checklist</h2>
-                        <div className="display-card">
-
-                            <Button
-                                className="float-right button-checklist"
-                                variant="primary"
-                                disabled={this.state.website.checklist[0].status === '0'}
-                                onClick={this.handleClick}
-                                value={this.state.website.id}
-                            >
-                                Rerun the checklist
-                            </Button>
-                            <Table striped bordered hover>
-                                <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Comment</th>
-                                    <th>Status</th>
-                                    <th>Completed at</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {tasks}
-                                </tbody>
-                            </Table>
-                            <ListGroup as="ul">
-                            </ListGroup>
+                    <div className="col-12 grid-margin stretch-card">
+                        <div className="card">
+                            <div className="card-body">
+                                <h4 className="card-title">Checklist</h4>
+                                <div className="card">
+                                    <Table striped bordered hover className={"table"}>
+                                        <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Comment</th>
+                                            <th>Status</th>
+                                            <th>Completed at</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {tasks}
+                                        </tbody>
+                                    </Table>
+                                    <Button
+                                        className="float-right button-checklist"
+                                        variant="primary"
+                                        disabled={this.state.website.checklist[0].status === '0'}
+                                        onClick={this.handleClick}
+                                        value={this.state.website.id}
+                                    >
+                                        Rerun the checklist
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>)
+                {/*<div className="row">*/}
+                {/*    <div className="col-md-6 mt-5">*/}
+                {/*        <Breadcrumb>*/}
+                {/*            <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>*/}
+                {/*            <Breadcrumb.Item active>Checklist</Breadcrumb.Item>*/}
+                {/*        </Breadcrumb>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
+
+
+            </div>
+        )
             ;
     }
 }
 
 
-SettingsList.propTypes = {
+ChecklistDetail.propTypes = {
     website: PropTypes.any,
 };
 
@@ -140,5 +146,5 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
     scheduleChecklist,
-})(withRouter(SettingsList));
+})(withRouter(ChecklistDetail));
 

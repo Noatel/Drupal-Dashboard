@@ -7,7 +7,8 @@ import {Button, Spinner} from "react-bootstrap";
 import {scheduleWebsite} from "../website/WebsiteActions";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";
-import {AiFillEye, AiOutlineLink, BsFillPencilFill} from "react-icons/all";
+import {AiFillEye, AiOutlineLink} from "react-icons/ai";
+import {HiPencil} from "react-icons/hi";
 
 
 class PageList extends Component {
@@ -88,7 +89,7 @@ class PageList extends Component {
                         style={{textTransform: 'capitalize'}}>{page.name ? page.name.split('-').join(' ') : "None"}  </p>
                     </td>
                     <td><a href={page.url} target="_blank" rel="noopener noreferrer"><AiOutlineLink/></a></td>
-                    <td><a href={page.url + "/edit"}><BsFillPencilFill/></a></td>
+                    <td><a href={page.url + "/edit"}><HiPencil/></a></td>
                     <td>
                         <Link to={"/page/" + page.id} key={page.id} page={page}>
                             <AiFillEye/>

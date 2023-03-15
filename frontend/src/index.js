@@ -5,13 +5,10 @@ import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import {ProSidebarProvider} from "react-pro-sidebar";
 
 
 ReactDOM.render(
-    <ProSidebarProvider>
-        <App/>
-    </ProSidebarProvider>
+    <App/>
     ,
     document.getElementById("root")
 );

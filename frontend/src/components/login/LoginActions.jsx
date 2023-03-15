@@ -81,7 +81,7 @@ export const logout = () => dispatch => {
     .post("/api/v1/token/logout/")
     .then(response => {
       dispatch(unsetCurrentUser());
-      dispatch(push("/"));
+      dispatch(push("/login"));
       toast.success("Logout successful.");
     })
     .catch(error => {

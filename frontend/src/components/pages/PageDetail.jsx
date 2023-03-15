@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import Table from "react-bootstrap/Table";
-import {AiFillExperiment, AiFillEye,} from "react-icons/all";
+import {AiFillExperiment, AiFillEye,} from "react-icons/ai";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import {toastOnError} from "../../utils/Utils";

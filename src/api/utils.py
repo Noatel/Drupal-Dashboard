@@ -51,6 +51,7 @@ def scan_page_test(websiteId: uuid.UUID):
     """
         This function will go to a specifc page and retreive drupal content blocks
 
+        :param websiteId:
         :param website: Give the components you want to get the sitemap from
     """
 
@@ -144,17 +145,23 @@ def check_for_deleted_blocks(websiteId: uuid.UUID):
 
 
 def schedule_website(websiteId: uuid.UUID):
+    print('oei ik ben hier')
+    print(websiteId)
     website = Website.objects.filter(id=websiteId).first()
 
+    print(website)
+    print('website gevonden?')
     # Get the sitemap
     scan, created = Scan.objects.get_or_create(
         website=website
     )
+    print(scan)
+    print('scan gevonden?')
 
     scan.completed_at = None
     scan.status = Scan.STATUS.SITEMAP
     scan.started_at = datetime.now()
-    scan.save(update_fields=['completed_at', 'started_at', 'status'])
+    scan.save()
 
     return scan
 
@@ -180,32 +187,32 @@ def check_all(websiteId: uuid.UUID):
 
     # FROM: Status[0] - Not started
     # TO: Status[1] - Sitemap
-    if checklist.status == '0':
+    if checklist.status == '0' or checklist.status == 0 :
         run_spider(CheckSitemapSpider, urls=[website.url])
 
     # FROM: Status[1] - Sitemap
     # TO: Status[2] - Robots
-    if checklist.status == '1':
+    if checklist.status == '1' or checklist.status == 1:
         run_spider(CheckRobotSpider, urls=[website.url])
 
     # FROM: Status[2] - Robots
     # TO: Status[3] - MetaTags
-    if checklist.status == '2':
+    if checklist.status == '2' or checklist.status == 2:
         run_spider(CheckMetaTagSpider, urls=pages)
 
     # FROM: Status[3] - MetaTags
     # TO: Status[4] - Google Analytics
-    if checklist.status == '3':
+    if checklist.status == '3' or checklist.status == 3:
         run_spider(CheckGoogleAnalyticsSpider, urls=[website.url])
 
     # FROM: Status[4] - Google analytics
     # TO: Status[5] - Nice URL's
-    if checklist.status == '4':
+    if checklist.status == '4' or checklist.status == 4:
         run_spider(CheckNiceUrlsSpider, urls=pages)
 
     # FROM: Status - Nice Url's
     # TO: Status - Completed
-    if checklist.status == '5':
+    if checklist.status == '5' or checklist.status == 5:
         checklist.status = 6
         checklist.save()
 

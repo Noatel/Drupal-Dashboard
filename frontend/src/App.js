@@ -9,7 +9,6 @@ import ActivateAccount from "./components/account/ActivateAccount";
 import ResetPassword from "./components/account/ResetPassword";
 import ResetPasswordConfirm from "./components/account/ResetPasswordConfirm";
 import Dashboard from "./components/dashboard/Dashboard";
-import requireAuth from "./utils/RequireAuth";
 import axios from "axios";
 import PageDetail from "./components/pages/PageDetail";
 import SideBar from "./components/Sidebar";
@@ -20,6 +19,7 @@ import BlockDetail from "./components/blocks/BlockDetail";
 import ClientsList from "./components/clients/ClientList";
 import ChecklistDetail from "./components/checklist/ChecklistDetail";
 import SettingsList from "./components/settings/SettingsList";
+import Navbar from "./components/Navbar";
 
 
 export const baseURL = process.env.REACT_APP_API_URL;
@@ -29,40 +29,48 @@ axios.defaults.baseURL = baseURL;
 class App extends Component {
     render() {
         return (
-            <div id="app" style={({height: "100vh"}, {display: "flex"})}>
+            <div id="app">
                 <Root>
 
-                    <SideBar/>
+                    <div className="container-scroller">
+                        <Navbar/>
+                        <div className="container-fluid page-body-wrapper">
+                            <SideBar/>
+                            <div className="main-panel">
+                                <div className="content-wrapper">
+                                    <ToastContainer hideProgressBar={true} newestOnTop={true}/>
+                                    <Route path="/signup" component={Signup}/>
+                                    <Route path="/login" component={Login}/>
+                                    <Route path="/dashboard" component={Dashboard}/>
+                                    <Route path="/" component={Home}/>
 
-                    <ToastContainer hideProgressBar={true} newestOnTop={true}/>
-                    <Route path="/signup" component={Signup}/>
-                    <Route path="/login" component={Login}/>
-                    <Route path="/dashboard" component={requireAuth(Dashboard)}/>
-                    <Route path="/" component={Home}/>
+                                    <Route path="/resend_activation" component={ResendActivation}/>
+                                    <Route path="/activate/:uid/:token" component={ActivateAccount}/>
+                                    <Route path="/send_reset_password/" component={ResetPassword}/>
+                                    <Route path="/reset_password/:uid/:token" component={ResetPasswordConfirm}/>
 
-                    <Route path="/resend_activation" component={ResendActivation}/>
-                    <Route path="/activate/:uid/:token" component={ActivateAccount}/>
-                    <Route path="/send_reset_password/" component={ResetPassword}/>
-                    <Route path="/reset_password/:uid/:token" component={ResetPasswordConfirm}/>
+                                    <Route path="/website/:id" component={WebsiteDetail}/>
+                                    <Route path="/page/:id" component={Page}/>
 
-                    <Route path="/website/:id" component={WebsiteDetail}/>
-                    <Route path="/page/:id" component={Page}/>
-
-                    <Route path="/page/:id/detail" component={PageDetail}/>
-                    <Route path="/page/:id/detail" component={PageDetail}/>
-                    <Route path="/page/:uid/detail" component={PageDetail}/>
+                                    <Route path="/page/:id/detail" component={PageDetail}/>
+                                    <Route path="/page/:id/detail" component={PageDetail}/>
+                                    <Route path="/page/:uid/detail" component={PageDetail}/>
 
 
-                    <Route path="/block/:id/results" component={BlockDetail}/>
+                                    <Route path="/block/:id/results" component={BlockDetail}/>
 
-                    <Route exact path="/clients" component={ClientsList}/>
-                    <Route exact path="/clients/website/:id" component={ChecklistDetail}/>
+                                    <Route exact path="/clients" component={ClientsList}/>
+                                    <Route exact path="/clients/website/:id" component={ChecklistDetail}/>
 
-                    <Route exact path="/settings" component={SettingsList}/>
-
+                                    <Route exact path="/settings" component={SettingsList}/>
+                                    {/*{ SettingsPanelComponent }*/}
+                                </div>
+                                {/*{ footerComponent }*/}
+                            </div>
+                        </div>
+                    </div>
                 </Root>
             </div>
-
         );
     }
 }

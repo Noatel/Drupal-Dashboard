@@ -1,13 +1,14 @@
-from django.db.models import Count
+from django.db.models import Count, Q, Sum
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, pagination, mixins, filters
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
-from src.api.models import Website, Page, Block, PageResult
+from src.api.models import Website, Page, Block, PageResult, Result, PageSpeed, Task
 from src.api.serializers import WebsiteSerializer, PageSerializer, BlockSerializer, \
-    PageWithResultsSerializer, WebsiteWithPagesSerializer, WebsiteWithChecklistSerializer, PageResultsSerializer
+    PageWithResultsSerializer, WebsiteWithPagesSerializer, WebsiteWithChecklistSerializer, PageResultsSerializer, \
+    WebsiteWithProblemsSerializer, WebsiteWithEditsSerializer, WebsiteAllProblemsSerializer
 from rest_framework.response import Response
 from src.api.utils import schedule_website, schedule_checklist
 
@@ -31,6 +32,89 @@ class WebsiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     def get_queryset(self):
         websites = self.queryset.filter()
         return websites
+
+    @action(methods=['get'], detail=True, url_name='known_issues', url_path='known_issues')
+    def known_issues(self, request, pk):
+        if pk:
+            total_count = \
+                PageResult.objects.exclude(attribute='meta').filter(page__website=pk).aggregate(
+                    count=Count('attribute'))[
+                    'count']
+            return Response(total_count)
+
+    def list(self, request, *args, **kwargs):
+        if self.request.GET.get('problems'):
+
+            serializer = WebsiteWithProblemsSerializer(self.queryset, many=True)
+            return Response(serializer.data)
+        elif self.request.GET.get('all_test'):
+            page_results = PageResult.objects.count()
+            results = Result.objects.count()
+            page_speed = PageSpeed.objects.count()
+            task = Task.objects.count()
+
+            count = page_results + results + page_speed + task
+
+            return Response(count)
+
+        elif self.request.GET.get('all_known_issues'):
+            total_count = PageResult.objects.exclude(attribute='meta').aggregate(count=Count('attribute'))['count']
+
+            return Response(total_count)
+
+        elif self.request.GET.get('all_problems'):
+            results = PageResult.objects.values('attribute').filter(~Q(attribute='meta')).annotate(
+                count=Count('attribute'))
+
+            # Create a dictionary to store the results
+            result = []
+            result_dict = {}
+            for r in results:
+                attribute = r['attribute']
+                count = r['count']
+                if attribute in result_dict:
+                    result_dict[attribute] += count
+                else:
+                    result_dict[attribute] = count
+
+                result.append({'name': attribute, 'value': count})
+            # Convert the dictionary to the desired output format
+
+            return Response(result)
+
+        elif self.request.GET.get('known_issue') and self.request.GET.get('website_id'):
+            id = self.request.GET.get('website_id')
+
+            total_count = PageResult.objects.filter(page__website__id=id).exclude(
+                attribute='meta').aggregate(count=Count('attribute'))['count']
+
+            return Response(total_count)
+
+        elif self.request.GET.get('test') and self.request.GET.get('website_id'):
+            website_id = self.request.GET.get('website_id')
+            page_results = PageResult.objects.filter(page__website_id=website_id).count()
+            results = Result.objects.filter(block__page__website_id=website_id).count()
+            page_speed = PageSpeed.objects.filter(page__website_id=website_id).count()
+            task = Task.objects.filter(check_list__website_id=website_id).count()
+
+            count = page_results + results + page_speed + task
+
+            return Response(count)
+        elif self.request.GET.get('edit'):
+            serializer = WebsiteWithEditsSerializer(self.queryset, many=True)
+
+            return Response(serializer.data)
+
+        # Use the paginator to paginate the queryset
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        # If the queryset is not paginated, just serialize it and return the response
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(methods=['get'], detail=True, url_name='pages', url_path='pages')
     def pages(self, request, pk):
@@ -93,7 +177,6 @@ class PageViewSet(viewsets.ModelViewSet):
 
         if self.request.GET.get('website_id'):
             pk = self.request.GET.get('website_id')
-            print(pk)
 
             queryset = Page.objects.filter(website__id=pk)
         else:

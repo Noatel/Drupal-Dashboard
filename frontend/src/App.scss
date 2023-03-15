@@ -1,0 +1,21 @@
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/compass-mixins/lib/compass";
+@import "node_modules/compass-mixins/lib/animate";
+
+@import '../src/assets/styles/variables/variables';
+@import '../src/assets/styles/mixins/mixins';
+
+
+@import '../src/assets/styles/functions';
+@import '../src/assets/styles/index';
+@import '../src/assets/styles/layout';
+@import '../src/assets/styles/misc';
+@import '../src/assets/styles/utilities';
+
+@import '../src/assets/styles/components/index';
+
+
+@import '../src/assets/styles/pages/dashboard';
+@import '../src/assets/styles/pages/sidebar';
+@import '../src/assets/styles/pages/navbar';
