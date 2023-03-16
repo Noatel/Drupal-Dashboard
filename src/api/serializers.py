@@ -199,7 +199,7 @@ class WebsiteWithEditsSerializer(serializers.ModelSerializer):
         return ResultSerializerWithoutData(results, many=True).data
 
     def get_pages(self, website):
-        return PageSerializer(website.pages.all()[:5], many=True).data
+        return PageSerializer(website.pages.filter(website=website)[:5], many=True).data
 
 
 class WebsiteAllProblemsSerializer(serializers.ModelSerializer):

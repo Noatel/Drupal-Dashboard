@@ -22,7 +22,7 @@ def format_url(url, second_url):
 
 
 class CheckNiceUrlsSpider(scrapy.Spider):
-    name = 'Google Analytics spider'
+    name = 'Check nice urls spider'
 
     def __init__(self, *args, **kwargs):
         # Disable the logging (Not needed)
